@@ -6,7 +6,7 @@ with open(join(dirname(__file__), 'scrapyd-client/VERSION')) as f:
 setup_args = {
     'name': 'scrapyd-client',
     'version': version,
-    'url': 'https://github.com/scrapy/scrapyd',
+    'url': 'https://github.com/scrapy/scrapyd-client',
     'description': 'A client for scrapyd',
     'long_description': open('README.rst').read(),
     'author': 'Scrapy developers',
@@ -25,7 +25,6 @@ setup_args = {
         'Operating System :: OS Independent',
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
-        'Environment :: No Input/Output (Daemon)',
         'Topic :: Internet :: WWW/HTTP',
     ],
 }
@@ -35,6 +34,6 @@ try:
 except ImportError:
     from distutils.core import setup
 else:
-    setup_args['install_requires'] = ['Twisted>=8.0', 'Scrapy>=0.17']
+    setup_args['install_requires'] = ['Scrapy>=0.17']
 
 setup(**setup_args)
