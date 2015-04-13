@@ -75,7 +75,7 @@ The version must be comparable with `LooseVersion <http://epydoc.sourceforge.net
 
 If you use Mercurial or Git, you can use ``HG`` or ``GIT`` respectively as the argument supplied to ``--version`` to use the current revision as the version. You can save yourself having to specify the version parameter by adding it to your target's entry in ``scrapy.cfg``::
 
-    [deploy:target}
+    [deploy:target]
     ...
     version = HG
 
