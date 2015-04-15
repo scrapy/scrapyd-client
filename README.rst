@@ -31,6 +31,16 @@ You can define Scrapyd targets in your project's ``scrapy.cfg`` file. Example::
     username = scrapy
     password = secret
 
+While your target needs to be defined with its URL in ``scrapy.cfg``, you can use `netrc <https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-File.html>`_ for username and password, like so::
+
+    machine scrapyd.example.com
+        username scrapy
+        password secret
+
+If you want to list all available targets, you can use the ``-l`` option::
+
+    scrapyd-deploy -l
+
 To list projects available on a specific target, use the ``-L`` option::
 
     scrapyd-deploy -L example
