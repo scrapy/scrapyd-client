@@ -82,7 +82,7 @@ def main():
         egg, tmpdir = _build_egg()
         _log("Writing egg to %s" % opts.build_egg)
         shutil.copyfile(egg, opts.build_egg)
-    else: # buld egg and deploy
+    else: # build egg and deploy
         target_name = _get_target_name(args)
         target = _get_target(target_name)
         project = _get_project(target, opts)
