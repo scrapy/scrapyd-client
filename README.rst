@@ -68,9 +68,14 @@ To save yourself from having to specify the target and project, you can set the 
     password = secret
     project = yourproject
 
+
 You can now deploy your project with just the following::
 
     scrapyd-deploy
+    
+If you have more than one target to deploy, you can deploy your project in all targets with one command::
+
+      scrapyd-deploy -a -p <project>
 
 .. _versioning:
 
@@ -80,6 +85,10 @@ Versioning
 By default, ``scrapyd-deploy`` uses the current timestamp for generating the project version, as shown above. However, you can pass a custom version using ``--version``::
 
     scrapyd-deploy <target> -p <project> --version <version>
+
+Or for all targets::
+
+    scrapyd-deploy -a -p <project> --version <version>
 
 The version must be comparable with `LooseVersion <http://epydoc.sourceforge.net/stdlib/distutils.version.LooseVersion-class.html>`_. Scrapyd will use the greatest version unless specified.
 
