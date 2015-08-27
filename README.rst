@@ -5,7 +5,7 @@ Scrapyd-client
 .. image:: https://secure.travis-ci.org/scrapy/scrapyd-client.png?branch=master
    :target: http://travis-ci.org/scrapy/scrapyd-client
 
-Scrapyd-client is a client for `scrapyd <https://github.com/scrapyd>`_. It provides the ``scrapyd-deploy`` utility which allows you to deploy your project to a Scrapyd server.
+Scrapyd-client is a client for `scrapyd <https://github.com/scrapy/scrapyd>`_. It provides the ``scrapyd-deploy`` utility which allows you to deploy your project to a Scrapyd server.
 
 .. _how-it-works:
 
@@ -14,7 +14,7 @@ How It Works
 
 Deploying your project to a Scrapyd server typically involves two steps:
 
-1. `Eggifying <http://peak.telecommunity.com/DevCenter/PythonEggs>`_ your project. You'll need to install `setuptools <http://pypi.python.org/pypi/setuptools>`_ for this. See :ref:`egg-caveats` below.
+1. `Eggifying <http://peak.telecommunity.com/DevCenter/PythonEggs>`_ your project. You'll need to install `setuptools <http://pypi.python.org/pypi/setuptools>`_ for this. See `Egg Caveats`_ below.
 2. Uploading the egg to the Scrapyd server through the `addversion.json <https://scrapyd.readthedocs.org/en/latest/api.html#addversion-json>`_ endpoint.
 
 The ``scrapyd-deploy`` tool automates the process of building the egg and pushing it to the target Scrapyd server.
@@ -31,7 +31,7 @@ You can define Scrapyd targets in your project's ``scrapy.cfg`` file. Example::
     username = scrapy
     password = secret
 
-While your target needs to be defined with its URL in ``scrapy.cfg``, you can use `netrc <https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-File.html>`_ for username and password, like so::
+While your target needs to be defined with its URL in ``scrapy.cfg``, you can use `netrc <https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html>`_ for username and password, like so::
 
     machine scrapyd.example.com
         username scrapy
