@@ -5,7 +5,7 @@ Scrapyd-client
 .. image:: https://secure.travis-ci.org/scrapy/scrapyd-client.png?branch=master
    :target: http://travis-ci.org/scrapy/scrapyd-client
 
-Scrapyd-client is a client for `scrapyd <https://github.com/scrapyd>`_. It provides the ``scrapyd-deploy`` utility which allows you to deploy your project to a Scrapyd server.
+Scrapyd-client is a client for `scrapyd <https://github.com/scrapy/scrapyd>`_. It provides the ``scrapyd-deploy`` utility which allows you to deploy your project to a Scrapyd server.
 
 .. _how-it-works:
 
@@ -14,7 +14,7 @@ How It Works
 
 Deploying your project to a Scrapyd server typically involves two steps:
 
-1. `Eggifying <http://peak.telecommunity.com/DevCenter/PythonEggs>`_ your project. You'll need to install `setuptools <http://pypi.python.org/pypi/setuptools>`_ for this. See :ref:`egg-caveats` below.
+1. `Eggifying <http://peak.telecommunity.com/DevCenter/PythonEggs>`_ your project. You'll need to install `setuptools <http://pypi.python.org/pypi/setuptools>`_ for this. See `Egg Caveats`_ below.
 2. Uploading the egg to the Scrapyd server through the `addversion.json <https://scrapyd.readthedocs.org/en/latest/api.html#addversion-json>`_ endpoint.
 
 The ``scrapyd-deploy`` tool automates the process of building the egg and pushing it to the target Scrapyd server.
@@ -31,7 +31,7 @@ You can define Scrapyd targets in your project's ``scrapy.cfg`` file. Example::
     username = scrapy
     password = secret
 
-While your target needs to be defined with its URL in ``scrapy.cfg``, you can use `netrc <https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-File.html>`_ for username and password, like so::
+While your target needs to be defined with its URL in ``scrapy.cfg``, you can use `netrc <https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html>`_ for username and password, like so::
 
     machine scrapyd.example.com
         username scrapy
@@ -68,9 +68,14 @@ To save yourself from having to specify the target and project, you can set the 
     password = secret
     project = yourproject
 
+
 You can now deploy your project with just the following::
 
     scrapyd-deploy
+    
+If you have more than one target to deploy, you can deploy your project in all targets with one command::
+
+      scrapyd-deploy -a -p <project>
 
 .. _versioning:
 
@@ -80,6 +85,10 @@ Versioning
 By default, ``scrapyd-deploy`` uses the current timestamp for generating the project version, as shown above. However, you can pass a custom version using ``--version``::
 
     scrapyd-deploy <target> -p <project> --version <version>
+
+Or for all targets::
+
+    scrapyd-deploy -a -p <project> --version <version>
 
 The version must be comparable with `LooseVersion <http://epydoc.sourceforge.net/stdlib/distutils.version.LooseVersion-class.html>`_. Scrapyd will use the greatest version unless specified.
 

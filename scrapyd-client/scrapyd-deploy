@@ -43,6 +43,7 @@ def parse_opts():
         help="the version to deploy. Defaults to current timestamp")
     parser.add_option("-l", "--list-targets", action="store_true", \
         help="list available targets")
+    parser.add_option("-a", "--deploy-all-targets",action="store_true", help="deploy all targets")
     parser.add_option("-d", "--debug", action="store_true",
         help="debug mode (do not remove build dir)")
     parser.add_option("-L", "--list-projects", metavar="TARGET", \
@@ -86,6 +87,12 @@ def main():
         egg, tmpdir = _build_egg(project, version)
         _log("Writing egg to %s" % opts.build_egg)
         shutil.copyfile(egg, opts.build_egg)
+    elif opts.deploy_all_targets:
+        target_version = None
+        for name, target in _get_targets().items():
+            if target_version is None:
+                target_version = _get_version(target, opts)
+            _build_egg_and_deploy_target(target, target_version, opts)
     else: # build egg and deploy
         if opts.egg:
             _log("Using egg: %s" % opts.egg)
@@ -103,6 +110,17 @@ def main():
             shutil.rmtree(tmpdir)
 
     sys.exit(exitcode)
+
+def _build_egg_and_deploy_target(target, version, opts):
+    project = _get_project(target, opts)
+    if opts.egg:
+        _log("Using egg: %s" % opts.egg)
+        egg = opts.egg
+    else:
+        _log("Packing version %s" % version)
+        egg, tmpdir = _build_egg(project, version)
+    if not _upload_egg(target, egg, project, version):
+        exitcode = 1
 
 def _log(message):
     sys.stderr.write(message + os.linesep)
