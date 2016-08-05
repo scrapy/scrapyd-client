@@ -21,6 +21,7 @@ from scrapy.utils.http import basic_auth_header
 from scrapy.utils.python import retry_on_eintr
 from scrapy.utils.conf import get_config, closest_scrapy_cfg
 
+
 _SETUP_PY_TEMPLATE = \
     """# Automatically created by: scrapyd-deploy
 
@@ -88,49 +89,42 @@ def main(args):
         print os.linesep.join(projects)
         return
 
-    tmpdir = None
+    tmpdir = tempfile.mkdtemp(prefix="scrapydeploy-")
+    try:
+        if opts.build_egg:  # build egg only
+            _build_egg(tmpdir, dest=opts.build_egg)
+        elif opts.deploy_all_targets:
+            for name, target in _get_targets().items():
+                exitcode += _deploy_target(target, tmpdir, opts.version,
+                                           opts.project, opts.egg)
+        else:  # buld egg and deploy
+            target_name = _get_target_name(args)
+            target = _get_target(target_name)
+            exitcode = _deploy_target(target, tmpdir, opts.version,
+                                      opts.project, opts.egg)
 
-    if opts.build_egg:  # build egg only
-        egg, tmpdir = _build_egg()
-        _log("Writing egg to %s" % opts.build_egg)
-        shutil.copyfile(egg, opts.build_egg)
-    elif opts.deploy_all_targets:
-        version = None
-        for name, target in _get_targets().items():
-            if version is None:
-                version = _get_version(target, opts.version)
-            _build_egg_and_deploy_target(
-                target, version, opts.project, opts.egg)
-    else:  # buld egg and deploy
-        target_name = _get_target_name(args)
-        target = _get_target(target_name)
-        version = _get_version(target, opts.version)
-        exitcode, tmpdir = _build_egg_and_deploy_target(
-            target, version, opts.project, opts.egg)
-
-    if tmpdir:
-        if opts.debug:
-            _log("Output dir not removed: %s" % tmpdir)
-        else:
-            shutil.rmtree(tmpdir)
-
-    sys.exit(exitcode)
+        sys.exit(exitcode)
+    finally:
+        if tmpdir:
+            if opts.debug:
+                _log("Output dir not removed: %s" % tmpdir)
+            else:
+                shutil.rmtree(tmpdir)
 
 
-def _build_egg_and_deploy_target(target, version, project, egg):
+def _deploy_target(target, tmpdir, version=None, project=None, egg=None):
     exitcode = 0
-    tmpdir = None
-
-    project = _get_project(target, project)
+    version = version or _get_version(target, version)
+    project = project or _get_project(target, project)
     if egg:
         _log("Using egg: %s" % egg)
         egg = egg
     else:
         _log("Packing version %s" % version)
-        egg, tmpdir = _build_egg()
+        egg = _build_egg(tmpdir)
     if not _upload_egg(target, egg, project, version):
         exitcode = 1
-    return exitcode, tmpdir
+    return exitcode
 
 
 def _log(message):
@@ -269,23 +263,31 @@ def _http_post(request):
         _log("Deploy failed: %s" % e)
 
 
-def _build_egg():
+def _build_egg(tmpdir, dest=None):
     closest = closest_scrapy_cfg()
     os.chdir(os.path.dirname(closest))
     if not os.path.exists('setup.py'):
         settings = get_config().get('settings', 'default')
         _create_default_setup_py(settings=settings)
-    d = tempfile.mkdtemp(prefix="scrapydeploy-")
-    o = open(os.path.join(d, "stdout"), "wb")
-    e = open(os.path.join(d, "stderr"), "wb")
-    retry_on_eintr(
-        check_call,
-        [sys.executable, 'setup.py', 'clean', '-a', 'bdist_egg', '-d', d],
-        stdout=o, stderr=e)
-    o.close()
-    e.close()
-    egg = glob.glob(os.path.join(d, '*.egg'))[0]
-    return egg, d
+
+    with open(
+            os.path.join(tmpdir, "stdout"), "wb"
+    ) as stdout, open(
+            os.path.join(tmpdir, "stderr"), "wb"
+    ) as stderr:
+        retry_on_eintr(
+            check_call,
+            [sys.executable, 'setup.py', 'clean', '-a', 'bdist_egg', '-d',
+             tmpdir],
+            stdout=stdout, stderr=stderr)
+
+    egg = glob.glob(os.path.join(tmpdir, '*.egg'))[0]
+
+    if dest:
+        _log("Writing egg to %s" % dest)
+        shutil.copyfile(egg, dest)
+
+    return egg
 
 
 def _create_default_setup_py(**kwargs):
