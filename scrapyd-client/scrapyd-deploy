@@ -62,7 +62,8 @@ def parse_opts(args):
         help="use the given egg, instead of building it")
     parser.add_option(
         "--build-egg", metavar="FILE",
-        help="only build the egg, don't deploy it")
+        help="Path to store the built egg, if specified it will only build "
+        "the egg, not deploy it")
     return parser.parse_args(args)
 
 
