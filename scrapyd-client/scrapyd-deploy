@@ -64,34 +64,67 @@ def parse_opts(args):
         "--build-egg", metavar="FILE",
         help="Path to store the built egg, if specified it will only build "
         "the egg, not deploy it")
+    parser.add_option(
+        "--pip-package", metavar="PACKAGE_SPEC",
+        help="Package to retrieve from pip, will use the source retrieved to "
+        "build the package")
     return parser.parse_args(args)
+
+
+def _get_tarball_name(pkg_name, basedir='.'):
+    _, _, files = os.walk(basedir).next()
+    try:
+        return (
+            fname for fname in files
+            if fname.startswith(pkg_name) and fname.endswith('.tar.gz')
+        ).next()
+    except StopIteration:
+        raise Exception('Tarball for %s not found in %s'
+                        % (pkg_name, basedir))
 
 
 def main(args):
     opts, args = parse_opts(args)
     exitcode = 0
-    if not inside_project():
-        _log("Error: no Scrapy project found in this location")
-        sys.exit(1)
-
-    urllib2.install_opener(urllib2.build_opener(HTTPRedirectHandler))
-
-    if opts.list_targets:
-        for name, target in _get_targets().items():
-            print "%-20s %s" % (name, target['url'])
-        return
-
-    if opts.list_projects:
-        target = _get_target(opts.list_projects)
-        req = urllib2.Request(_url(target, 'listprojects.json'))
-        _add_auth_header(req, target)
-        f = urllib2.urlopen(req)
-        projects = json.loads(f.read())['projects']
-        print os.linesep.join(projects)
-        return
-
     tmpdir = tempfile.mkdtemp(prefix="scrapydeploy-")
     try:
+        if opts.pip_package:
+            os.chdir(tmpdir)
+            _retry_command(
+                tmpdir,
+                check_call,
+                ['pip', 'download', '--no-deps', opts.pip_package],
+            )
+            pkg_name = opts.pip_package.split('=')[0]
+            tarball = _get_tarball_name(pkg_name)
+            _retry_command(
+                tmpdir,
+                check_call,
+                ['tar', 'xvzf', tarball]
+            )
+            os.chdir(tarball[:-7])
+
+        if not inside_project():
+            _log("Error: no Scrapy project found in this location")
+            sys.exit(1)
+
+        urllib2.install_opener(urllib2.build_opener(HTTPRedirectHandler))
+
+        if opts.list_targets:
+            for name, target in _get_targets().items():
+                print "%-20s %s" % (name, target['url'])
+            return
+
+        if opts.list_projects:
+            target = _get_target(opts.list_projects)
+            req = urllib2.Request(_url(target, 'listprojects.json'))
+            _add_auth_header(req, target)
+            f = urllib2.urlopen(req)
+            projects = json.loads(f.read())['projects']
+            print os.linesep.join(projects)
+            return
+
+
         if opts.build_egg:  # build egg only
             _build_egg(tmpdir, dest=opts.build_egg)
         elif opts.deploy_all_targets:
@@ -271,16 +304,11 @@ def _build_egg(tmpdir, dest=None):
         settings = get_config().get('settings', 'default')
         _create_default_setup_py(settings=settings)
 
-    with open(
-            os.path.join(tmpdir, "stdout"), "wb"
-    ) as stdout, open(
-            os.path.join(tmpdir, "stderr"), "wb"
-    ) as stderr:
-        retry_on_eintr(
-            check_call,
-            [sys.executable, 'setup.py', 'clean', '-a', 'bdist_egg', '-d',
-             tmpdir],
-            stdout=stdout, stderr=stderr)
+    _retry_command(
+        tmpdir,
+        check_call,
+        [sys.executable, 'setup.py', 'clean', '-a', 'bdist_egg', '-d', tmpdir]
+    )
 
     egg = glob.glob(os.path.join(tmpdir, '*.egg'))[0]
 
@@ -289,6 +317,18 @@ def _build_egg(tmpdir, dest=None):
         shutil.copyfile(egg, dest)
 
     return egg
+
+
+def _retry_command(tmpdir, *args, **kwargs):
+    with open(
+            os.path.join(tmpdir, "stdout"), "wb"
+    ) as stdout, open(
+            os.path.join(tmpdir, "stderr"), "wb"
+    ) as stderr:
+        kwargs['stdout'] = stdout
+        kwargs['stdin'] = stderr
+        retry_on_eintr(*args, **kwargs)
+
 
 
 def _create_default_setup_py(**kwargs):
