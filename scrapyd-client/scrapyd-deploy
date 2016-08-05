@@ -93,7 +93,7 @@ def main():
         target_name = _get_target_name(args)
         target = _get_target(target_name)
         version = _get_version(target, opts)
-        exitcode = _build_egg_and_deploy_target(target, version, opts)
+        exitcode, tmpdir = _build_egg_and_deploy_target(target, version, opts)
 
     if tmpdir:
         if opts.debug:
@@ -105,6 +105,8 @@ def main():
 
 def _build_egg_and_deploy_target(target, version, opts):
     exitcode = 0
+    tmpdir = None
+
     project = _get_project(target, opts)
     if opts.egg:
         _log("Using egg: %s" % opts.egg)
@@ -114,7 +116,7 @@ def _build_egg_and_deploy_target(target, version, opts):
         egg, tmpdir = _build_egg()
     if not _upload_egg(target, egg, project, version):
         exitcode = 1
-    return exitcode
+    return exitcode, tmpdir
 
 def _log(message):
     sys.stderr.write(message + os.linesep)
