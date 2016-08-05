@@ -35,7 +35,7 @@ setup(
 """
 
 
-def parse_opts():
+def parse_opts(args):
     parser = OptionParser(
         usage="%prog [options] [ [target] | -l | -L <target> ]",
         description="Deploy Scrapy project to Scrapyd server")
@@ -62,11 +62,11 @@ def parse_opts():
     parser.add_option(
         "--build-egg", metavar="FILE",
         help="only build the egg, don't deploy it")
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
-def main():
-    opts, args = parse_opts()
+def main(args):
+    opts, args = parse_opts(args)
     exitcode = 0
     if not inside_project():
         _log("Error: no Scrapy project found in this location")
@@ -314,4 +314,4 @@ class HTTPRedirectHandler(urllib2.HTTPRedirectHandler):
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
