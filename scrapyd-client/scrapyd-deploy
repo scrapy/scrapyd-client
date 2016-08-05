@@ -98,13 +98,15 @@ def main(args):
         version = None
         for name, target in _get_targets().items():
             if version is None:
-                version = _get_version(target, opts)
-            _build_egg_and_deploy_target(target, version, opts)
+                version = _get_version(target, opts.version)
+            _build_egg_and_deploy_target(
+                target, version, opts.project, opts.egg)
     else:  # buld egg and deploy
         target_name = _get_target_name(args)
         target = _get_target(target_name)
-        version = _get_version(target, opts)
-        exitcode, tmpdir = _build_egg_and_deploy_target(target, version, opts)
+        version = _get_version(target, opts.version)
+        exitcode, tmpdir = _build_egg_and_deploy_target(
+            target, version, opts.project, opts.egg)
 
     if tmpdir:
         if opts.debug:
@@ -115,14 +117,14 @@ def main(args):
     sys.exit(exitcode)
 
 
-def _build_egg_and_deploy_target(target, version, opts):
+def _build_egg_and_deploy_target(target, version, project, egg):
     exitcode = 0
     tmpdir = None
 
-    project = _get_project(target, opts)
-    if opts.egg:
-        _log("Using egg: %s" % opts.egg)
-        egg = opts.egg
+    project = _get_project(target, project)
+    if egg:
+        _log("Using egg: %s" % egg)
+        egg = egg
     else:
         _log("Packing version %s" % version)
         egg, tmpdir = _build_egg()
@@ -149,8 +151,8 @@ def _get_target_name(args):
         return 'default'
 
 
-def _get_project(target, opts):
-    project = opts.project or target.get('project')
+def _get_project(target, project=None):
+    project = project or target.get('project')
     if not project:
         raise _fail("Error: Missing project")
     return project
@@ -187,8 +189,8 @@ def _url(target, action):
     return urljoin(target['url'], action)
 
 
-def _get_version(target, opts):
-    version = opts.version or target.get('version')
+def _get_version(target, version=None):
+    version = version or target.get('version')
     if version == 'HG':
         p = Popen(['hg', 'tip', '--template', '{rev}'], stdout=PIPE)
         d = 'r%s' % p.communicate()[0]
