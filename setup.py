@@ -34,6 +34,6 @@ try:
 except ImportError:
     from distutils.core import setup
 else:
-    setup_args['install_requires'] = ['Scrapy>=0.17']
+    setup_args['install_requires'] = ['Scrapy>=0.17', 'six']
 
 setup(**setup_args)
