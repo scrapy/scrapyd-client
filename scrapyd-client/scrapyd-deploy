@@ -225,7 +225,7 @@ def _http_post(request):
     try:
         f = urlopen(request)
         _log("Server response (%s):" % f.code)
-        print(f.read())
+        print(f.read().decode('utf-8'))
         return True
     except HTTPError as e:
         _log("Deploy failed (%s):" % e.code)
