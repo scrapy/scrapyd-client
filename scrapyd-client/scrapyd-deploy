@@ -48,28 +48,40 @@ def parse_opts():
         help="debug mode (do not remove build dir)")
     parser.add_option("-L", "--list-projects", metavar="TARGET", \
         help="list available projects on TARGET")
-    parser.add_option("--egg", metavar="FILE",
-        help="use the given egg, instead of building it")
+    parser.add_option("--egg", metavar="FILE/URL",
+        help="use and download if needed the given egg, instead of building "
+        "it")
     parser.add_option("--build-egg", metavar="FILE",
         help="only build the egg, don't deploy it")
+    parser.add_option("--settings-module", metavar="SCRAPY_SETTINGS_MODULE",
+        help="python module to load as scrapy settings, can be passed also "
+        "through the env var SCRAPY_SETTINGS_MODULE")
+    parser.add_option("--url", metavar="SCRAPYD_URL",
+        help="URL to the scrapyd server, overrides the url definition in the "
+        "target if any")
     return parser.parse_args()
 
 def main():
     opts, args = parse_opts()
     exitcode = 0
+    if opts.settings_module:
+        os.environ['SCRAPY_SETTINGS_MODULE'] = opts.settings_module
+
     if not inside_project():
-        _log("Error: no Scrapy project found in this location")
+        _log("Error: no Scrapy project found in this location and no url"
+             "passed, ")
         sys.exit(1)
+
 
     urllib2.install_opener(urllib2.build_opener(HTTPRedirectHandler))
 
     if opts.list_targets:
-        for name, target in _get_targets().items():
+        for name, target in _get_targets(opts).items():
             print "%-20s %s" % (name, target['url'])
         return
 
     if opts.list_projects:
-        target = _get_target(opts.list_projects)
+        target = _get_target(opts.list_projects, opts)
         req = urllib2.Request(_url(target, 'listprojects.json'))
         _add_auth_header(req, target)
         f = urllib2.urlopen(req)
@@ -85,13 +97,13 @@ def main():
         shutil.copyfile(egg, opts.build_egg)
     elif opts.deploy_all_targets:
         version = None
-        for name, target in _get_targets().items():
+        for name, target in _get_targets(opts).items():
             if version is None:
                 version = _get_version(target, opts)
             _build_egg_and_deploy_target(target, version, opts)
-    else: # buld egg and deploy
+    else: # buld/retrieve egg and deploy
         target_name = _get_target_name(args)
-        target = _get_target(target_name)
+        target = _get_target(target_name, opts)
         version = _get_version(target, opts)
         exitcode, tmpdir = _build_egg_and_deploy_target(target, version, opts)
 
@@ -144,12 +156,16 @@ def _get_option(section, option, default=None):
     return cfg.get(section, option) if cfg.has_option(section, option) \
         else default
 
-def _get_targets():
+def _get_targets(opts):
     cfg = get_config()
     baset = dict(cfg.items('deploy')) if cfg.has_section('deploy') else {}
     targets = {}
     if 'url' in baset:
         targets['default'] = baset
+    if opts and opts.url:
+        if 'default' not in targets:
+            targets['default'] = {}
+        targets['default']['url'] = opts.url
     for x in cfg.sections():
         if x.startswith('deploy:'):
             t = baset.copy()
@@ -157,9 +173,10 @@ def _get_targets():
             targets[x[7:]] = t
     return targets
 
-def _get_target(name):
+
+def _get_target(name='default', opts=None):
     try:
-        return _get_targets()[name]
+        return _get_targets(opts)[name]
     except KeyError:
         raise _fail("Unknown target: %s" % name)
 
@@ -190,8 +207,16 @@ def _get_version(target, opts):
         return str(int(time.time()))
 
 def _upload_egg(target, eggpath, project, version):
-    with open(eggpath, 'rb') as f:
+    if eggpath.startswith('http'):
+        eggdata = urllib2.Request
+        req = urllib2.Request(eggpath)
+        f = urllib2.urlopen(req)
         eggdata = f.read()
+
+    else:
+        with open(eggpath, 'rb') as f:
+            eggdata = f.read()
+
     data = {
         'project': project,
         'version': version,
