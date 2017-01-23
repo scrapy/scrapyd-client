@@ -1,6 +1,6 @@
 from os.path import join, dirname
 
-with open(join(dirname(__file__), 'scrapyd-client/VERSION')) as f:
+with open(join(dirname(__file__), 'scrapyd_client/VERSION')) as f:
     version = f.read().strip()
 
 setup_args = {
@@ -13,8 +13,11 @@ setup_args = {
     'maintainer': 'Scrapy developers',
     'maintainer_email': 'info@scrapy.org',
     'license': 'BSD',
-    'packages': ['scrapyd-client'],
-    'scripts': ['scrapyd-client/scrapyd-deploy'],
+    'packages': ['scrapyd_client'],
+    #'scripts': ['scrapyd_client/scrapyd_deploy.py'],
+    'entry_points':{
+        'console_scripts': ['scrapyd-deploy = scrapyd_client.deploy:main']
+    },
     'include_package_data': True,
     'zip_safe': False,
     'classifiers': [
