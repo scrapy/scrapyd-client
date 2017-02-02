@@ -7,6 +7,7 @@ from traceback import print_exc
 from scrapy.utils.conf import get_config as get_scrapy_config
 
 from scrapyd_client.lib import get_projects
+from scrapyd_client.utils import ErrorResponse
 
 
 DEFAULT_TARGET_URL = 'http://localhost:6800'
@@ -63,6 +64,9 @@ def main():
         args.action(args)
     except SystemExit:
         raise
+    except ErrorResponse as e:
+        print('Scrapyd responded with an error: {}'.format(str(e)))
+        raise SystemExit(1)
     except Exception:
         print('Caught unhandled exception, please report at {}'.format(ISSUE_TRACKER_URL))
         print_exc()

@@ -1,6 +1,6 @@
-import requests
+from scrapyd_client.utils import get_response
 
 
 def get_projects(url):
-    response = requests.get(url + '/listprojects.json')
-    return response.json()['projects']
+    response = get_response(url + '/listprojects.json')
+    return response['projects']
