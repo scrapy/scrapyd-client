@@ -5,8 +5,8 @@ class ErrorResponse(Exception):
     pass
 
 
-def get_response(url):
-    response = requests.get(url).json()
+def get_response(url, params={}):
+    response = requests.get(url, params=params).json()
     status = response['status']
     if status == 'ok':
         return response

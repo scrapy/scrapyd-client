@@ -2,16 +2,21 @@ from __future__ import print_function
 
 from argparse import ArgumentParser
 import sys
+from textwrap import indent
 from traceback import print_exc
 
 from scrapy.utils.conf import get_config as get_scrapy_config
 
-from scrapyd_client.lib import get_projects
+from scrapyd_client import lib
 from scrapyd_client.utils import ErrorResponse
 
 
 DEFAULT_TARGET_URL = 'http://localhost:6800'
+INDENT_PREFIX = '  '
 ISSUE_TRACKER_URL = 'https://github.com/scrapy/scrapyd-client/issues'
+
+
+# commands' functions
 
 
 def deploy(args):
@@ -21,19 +26,35 @@ def deploy(args):
 
 
 def projects(args):
-    _projects = get_projects(args.target)
+    _projects = lib.get_projects(args.target)
     if _projects:
         print('\n'.join(_projects))
 
 
+def spiders(args):
+    """ Lists all spiders for the given project(s). """
+    _projects = lib.get_projects(args.target, args.project)
+    for project in _projects:
+        print('{}:'.format(project))
+        _spiders = lib.get_spiders(args.target, project)
+        if _spiders:
+            print(indent('\n'.join(_spiders), INDENT_PREFIX))
+        else:
+            print(INDENT_PREFIX + 'No spiders.')
+
+
+# cli
+
+
 def parse_cli_args(args, cfg):
     target_default = cfg.get('deploy', 'url', fallback=DEFAULT_TARGET_URL).rstrip('/')
+    project_default = cfg.get('deploy', 'project', fallback='*')
 
     description = 'A command line interface for Scrapyd.'
     mainparser = ArgumentParser(description=description)
     subparsers = mainparser.add_subparsers()
     mainparser.add_argument('-t', '--target', default=target_default,
-                        help="Specifies the Scrapyd's API base URL.")
+                            help="Specifies the Scrapyd's API base URL.")
 
     description = 'Deploys a Scrapy project to a Scrapyd instance. ' \
                   'For help on this command, invoke `scrapyd-deploy`.'
@@ -43,6 +64,11 @@ def parse_cli_args(args, cfg):
     description = 'Lists all projects deployed on a Scrapyd instance.'
     parser = subparsers.add_parser('projects', description=description)
     parser.set_defaults(action=projects)
+
+    parser = subparsers.add_parser('spiders', description=spiders.__doc__)
+    parser.set_defaults(action=spiders)
+    parser.add_argument('-p', '--project', default=project_default,
+                        help='Specifies the project, can contain wildcard-patterns.')
 
     # TODO remove next two lines when 'deploy' is moved to this module
     parsed_args, _ = mainparser.parse_known_args(args)
@@ -54,7 +80,6 @@ def parse_cli_args(args, cfg):
         raise SystemExit(0)
 
     return parsed_args
-
 
 
 def main():
