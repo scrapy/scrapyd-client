@@ -15,7 +15,8 @@ setup_args = {
     'license': 'BSD',
     'packages': ['scrapyd_client'],
     'entry_points':{
-        'console_scripts': ['scrapyd-deploy = scrapyd_client.deploy:main']
+        'console_scripts': ['scrapyd-deploy = scrapyd_client.deploy:main',
+                            'scrapyd-client = scrapyd_client.cli:main']
     },
     'include_package_data': True,
     'zip_safe': False,
@@ -37,6 +38,6 @@ try:
 except ImportError:
     from distutils.core import setup
 else:
-    setup_args['install_requires'] = ['Scrapy>=0.17', 'six']
+    setup_args['install_requires'] = ['requests', 'Scrapy>=0.17', 'six']
 
 setup(**setup_args)
