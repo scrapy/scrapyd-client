@@ -20,12 +20,15 @@ ISSUE_TRACKER_URL = 'https://github.com/scrapy/scrapyd-client/issues'
 
 
 def deploy(args):
+    """ Deploys a Scrapy project to a Scrapyd instance.
+        For help on this command, invoke `scrapyd-deploy`. """
     from scrapyd_client import deploy
     sys.argv.pop(1)
     deploy.main()
 
 
 def projects(args):
+    """ Lists all projects deployed on a Scrapyd instance. """
     _projects = lib.get_projects(args.target)
     if _projects:
         print('\n'.join(_projects))
@@ -56,13 +59,10 @@ def parse_cli_args(args, cfg):
     mainparser.add_argument('-t', '--target', default=target_default,
                             help="Specifies the Scrapyd's API base URL.")
 
-    description = 'Deploys a Scrapy project to a Scrapyd instance. ' \
-                  'For help on this command, invoke `scrapyd-deploy`.'
-    parser = subparsers.add_parser('deploy', description=description)
+    parser = subparsers.add_parser('deploy', description=deploy.__doc__)
     parser.set_defaults(action=deploy)
 
-    description = 'Lists all projects deployed on a Scrapyd instance.'
-    parser = subparsers.add_parser('projects', description=description)
+    parser = subparsers.add_parser('projects', description=projects.__doc__)
     parser.set_defaults(action=projects)
 
     parser = subparsers.add_parser('spiders', description=spiders.__doc__)
