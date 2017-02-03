@@ -5,10 +5,11 @@ import sys
 from textwrap import indent
 from traceback import print_exc
 
+from requests.exceptions import ConnectionError
 from scrapy.utils.conf import get_config as get_scrapy_config
 
 from scrapyd_client import lib
-from scrapyd_client.utils import ErrorResponse
+from scrapyd_client.utils import ErrorResponse, MalformedRespone
 
 
 DEFAULT_TARGET_URL = 'http://localhost:6800'
@@ -107,12 +108,31 @@ def main():
         config = get_scrapy_config()
         args = parse_cli_args(sys.argv[1:], config)
         args.action(args)
-    except SystemExit:
-        raise
+    except KeyboardInterrupt:
+        print('Aborted due to keyboard interrupt.')
+        exit_code = 0
+    except SystemExit as e:
+        exit_code = e.code
+    except ConnectionError as e:
+        print('Failed to connect to target ({}):'.format(args.target))
+        print(e)
+        exit_code = 1
     except ErrorResponse as e:
-        print('Scrapyd responded with an error: {}'.format(str(e)))
-        raise SystemExit(1)
+        print('Scrapyd responded with an error:')
+        print(e)
+        exit_code = 1
+    except MalformedRespone as e:
+        text = str(e)
+        if len(text) > 120:
+            text = text[:50] + ' [...] ' + text[-50:]
+        print('Received a malformed response:')
+        print(text)
+        exit_code = 1
     except Exception:
         print('Caught unhandled exception, please report at {}'.format(ISSUE_TRACKER_URL))
         print_exc()
-        raise SystemExit(3)
+        exit_code = 3
+    else:
+        exit_code = 0
+    finally:
+        raise SystemExit(exit_code)
