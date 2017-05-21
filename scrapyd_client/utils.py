@@ -28,12 +28,11 @@ def _process_response(response):
     return response
 
 
-def get_response(url, params={}):
+def get_request(url, params={}):
     response = requests.get(url, params=params)
     return _process_response(response)
 
 
-def post_response(url, data):
+def post_request(url, data):
     response = requests.post(url, data=data)
     return _process_response(response)
-
