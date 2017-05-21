@@ -27,7 +27,7 @@ def schedule(args):
     job_args = dict((x[0], x[1]) for x in (y.split('=', 1) for y in args.arg))
     _projects = lib.get_projects(args.target, args.project)
     for project in _projects:
-        _spiders = lib.get_spiders(args.target, _projects, args.spider)
+        _spiders = lib.get_spiders(args.target, project, args.spider)
         for spider in _spiders:
             job_id = lib.schedule(args.target, project, spider, job_args)
             print(job_id)
