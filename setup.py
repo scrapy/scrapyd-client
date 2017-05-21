@@ -14,7 +14,7 @@ setup_args = {
     'maintainer_email': 'info@scrapy.org',
     'license': 'BSD',
     'packages': ['scrapyd_client'],
-    'entry_points':{
+    'entry_points': {
         'console_scripts': ['scrapyd-deploy = scrapyd_client.deploy:main',
                             'scrapyd-client = scrapyd_client.cli:main']
     },

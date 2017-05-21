@@ -45,7 +45,8 @@ def parse_cli_args(args, cfg):
     parser.add_argument('project', nargs='?', default='*', metavar='PROJECT',
                         help='Specifies the project, can be a globbing pattern.')
     parser.add_argument('-v', '--verbose', action='store_true', default=False,
-                        help='Prints the project and spider in each line, intended for processing stdout.')
+                        help='Prints the project and spider in each line, intended for processing '
+                             'stdout in scripts.')
 
     # TODO remove next two lines when 'deploy' is moved to this module
     parsed_args, _ = mainparser.parse_known_args(args)
