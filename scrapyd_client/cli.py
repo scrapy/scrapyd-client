@@ -44,6 +44,8 @@ def parse_cli_args(args, cfg):
     parser.set_defaults(action=commands.spiders)
     parser.add_argument('-p', '--project', default=project_default,
                         help='Specifies the project, can contain wildcard-patterns.')
+    parser.add_argument('-v', '--verbose', action='store_true', default=False,
+                        help='Prints the project and spider in each line, intended for processing stdout.')
 
     # TODO remove next two lines when 'deploy' is moved to this module
     parsed_args, _ = mainparser.parse_known_args(args)

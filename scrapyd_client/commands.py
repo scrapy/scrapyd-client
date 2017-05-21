@@ -37,9 +37,12 @@ def spiders(args):
     """ Lists all spiders for the given project(s). """
     _projects = lib.get_projects(args.target, args.project)
     for project in _projects:
-        print('{}:'.format(project))
-        _spiders = lib.get_spiders(args.target, project)
-        if _spiders:
-            print(indent('\n'.join(_spiders), INDENT_PREFIX))
-        else:
-            print(INDENT_PREFIX + 'No spiders.')
+        project_spiders = lib.get_spiders(args.target, project)
+        if not args.verbose:
+            print('{}:'.format(project))
+            if project_spiders:
+                print(indent('\n'.join(project_spiders), INDENT_PREFIX))
+            else:
+                print(INDENT_PREFIX + 'No spiders.')
+        elif project_spiders:
+            print('\n'.join('{} {}'.format(project, x) for x in project_spiders))
