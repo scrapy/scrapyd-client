@@ -33,17 +33,17 @@ def parse_cli_args(args, cfg):
 
     parser = subparsers.add_parser('schedule', description=commands.schedule.__doc__)
     parser.set_defaults(action=commands.schedule)
-    parser.add_argument('-p', '--project', default=project_default,
-                        help='Specifies the project, can contain wildcard-patterns.')
-    parser.add_argument('-s', '--spider', default='*',
-                        help='Specifies the spider, can contain wildcard-patterns.')
+    parser.add_argument('project', nargs='?', default=project_default, metavar='PROJECT',
+                        help='Specifies the project, can be a globbing pattern.')
+    parser.add_argument('spider', nargs='?', default='*', metavar='SPIDER',
+                        help='Specifies the spider, can be a globbing pattern.')
     parser.add_argument('--arg', action='append', default=[],
                         help='Additional argument (key=value), can be specified multiple times.')
 
     parser = subparsers.add_parser('spiders', description=commands.spiders.__doc__)
     parser.set_defaults(action=commands.spiders)
-    parser.add_argument('-p', '--project', default=project_default,
-                        help='Specifies the project, can contain wildcard-patterns.')
+    parser.add_argument('project', nargs='?', default='*', metavar='PROJECT',
+                        help='Specifies the project, can be a globbing pattern.')
     parser.add_argument('-v', '--verbose', action='store_true', default=False,
                         help='Prints the project and spider in each line, intended for processing stdout.')
 
