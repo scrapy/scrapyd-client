@@ -25,6 +25,6 @@ def test_schedule(mocker, script_runner):
 
     result = script_runner.run('scrapyd-client', 'schedule', 'foo', 'bar')
 
-    assert result.success, result.stderr
+    assert result.success, result.stdout + '\n' + result.stderr
     assert not result.stderr, result.stderr
     assert result.stdout == '42\n'

@@ -1,5 +1,7 @@
-from json.decoder import JSONDecodeError
 from requests.exceptions import ConnectionError
+
+
+from scrapyd_client.utils import JSONDecodeError
 
 
 def test_decode_error(mocker, script_runner):

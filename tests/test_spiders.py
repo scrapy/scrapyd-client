@@ -15,7 +15,7 @@ def test_spiders(mocker, script_runner):
     mock_get.return_value = mock_response
     result = script_runner.run('scrapyd-client', 'spiders')
 
-    assert result.success, result.stderr
+    assert result.success, result.stdout + '\n' + result.stderr
     assert not result.stderr, result.stderr
     assert result.stdout == """
 foo:
@@ -36,7 +36,7 @@ def test_spiders_verbose(mocker, script_runner):
     mock_get.return_value = mock_response
     result = script_runner.run('scrapyd-client', 'spiders', '-v')
 
-    assert result.success, result.stderr
+    assert result.success, result.stdout + '\n' + result.stderr
     assert not result.stderr, result.stderr
     assert result.stdout == """
 foo foo_1

@@ -5,19 +5,18 @@ from argparse import ArgumentParser
 from traceback import print_exc
 
 from requests.exceptions import ConnectionError
-from scrapy.utils.conf import get_config as get_scrapy_config
 
 from scrapyd_client import commands
-from scrapyd_client.utils import ErrorResponse, MalformedRespone
+from scrapyd_client.utils import ErrorResponse, MalformedRespone, get_config
 
 
 DEFAULT_TARGET_URL = 'http://localhost:6800'
 ISSUE_TRACKER_URL = 'https://github.com/scrapy/scrapyd-client/issues'
 
 
-def parse_cli_args(args, cfg):
-    target_default = cfg.get('deploy', 'url', fallback=DEFAULT_TARGET_URL).rstrip('/')
-    project_default = cfg.get('deploy', 'project', fallback='*')
+def parse_cli_args(args):
+    target_default = get_config('deploy', 'url', fallback=DEFAULT_TARGET_URL).rstrip('/')
+    project_default = get_config('deploy', 'project', fallback='*')
 
     description = 'A command line interface for Scrapyd.'
     mainparser = ArgumentParser(description=description)
@@ -62,8 +61,7 @@ def parse_cli_args(args, cfg):
 
 def main():
     try:
-        config = get_scrapy_config()
-        args = parse_cli_args(sys.argv[1:], config)
+        args = parse_cli_args(sys.argv[1:])
         args.action(args)
     except KeyboardInterrupt:
         print('Aborted due to keyboard interrupt.')
