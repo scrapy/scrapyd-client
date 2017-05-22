@@ -5,15 +5,67 @@ Scrapyd-client
 .. image:: https://secure.travis-ci.org/scrapy/scrapyd-client.png?branch=master
    :target: http://travis-ci.org/scrapy/scrapyd-client
 
-Scrapyd-client is a client for Scrapyd_. It provides the ``scrapyd-deploy`` utility which allows
-you to deploy your project to a Scrapyd server.
+Scrapyd-client is a client for Scrapyd_. It provides the general ``scrapyd-client`` and the
+``scrapyd-deploy`` utility which allows you to deploy your project to a Scrapyd server.
 
 .. _Scrapyd: https://scrapyd.readthedocs.io
 
-.. _how-it-works:
+
+scrapyd-client
+--------------
+
+For a reference on each subcommand invoke ``scrapyd-client <subcommand> --help``.
+
+Where filtering with wildcards is possible, it is facilitated with fnmatch_.
+
+.. _fnmatch: https://docs.python.org/library/fnmatch.html
+
+deploy
+~~~~~~
+
+At the moment this is a wrapper around `scrapyd-deploy`_. Note that the command line options
+of this one are likely to change.
+
+projects
+~~~~~~~~
+
+Lists all projects of a Scrapyd instance::
+
+   # lists all projects on the default target
+   scrapyd-client projects
+   # lists all projects from a custom URL
+   scrapyd-client -t http://scrapyd.example.net projects
+
+schedule
+~~~~~~~~
+
+Schedules one or more spiders to be executed::
+
+   # schedules any spider
+   scrapyd-client schedule
+   # schedules all spiders from the 'knowledge' project
+   scrapyd-client schedule knowledge
+   # schedules any spider whose name ends with '_daily'
+   scrapyd-client schedule * *_daily
+
+spiders
+~~~~~~~
+
+Lists spiders of one or more projects::
+
+   # lists all spiders
+   scrapyd-client spiders
+   # lists all spiders from the 'knowledge' project
+   scrapyd-client spiders knowledge
+   # lists all spiders from the 'knowledge' project whose name ends with '_monthly'
+   scrapyd-client spiders knowledge *_monthly
+
+
+scrapyd-deploy
+--------------
 
 How It Works
-------------
+~~~~~~~~~~~~
 
 Deploying your project to a Scrapyd server typically involves two steps:
 
@@ -27,37 +79,8 @@ Scrapyd server.
 .. _Eggifying: http://peak.telecommunity.com/DevCenter/PythonEggs
 .. _setuptools: https://pypi.python.org/pypi/setuptools
 
-.. _targets:
-
-Targets
--------
-
-You can define Scrapyd targets in your project's ``scrapy.cfg`` file. Example::
-
-    [deploy:example]
-    url = http://scrapyd.example.com/api/scrapyd
-    username = scrapy
-    password = secret
-
-While your target needs to be defined with its URL in ``scrapy.cfg``,
-you can use netrc_ for username and password, like so::
-
-    machine scrapyd.example.com
-        username scrapy
-        password secret
-
-If you want to list all available targets, you can use the ``-l`` option::
-
-    scrapyd-deploy -l
-
-To list projects available on a specific target, use the ``-L`` option::
-
-    scrapyd-deploy -L example
-
-.. _netrc: https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html
-
 Deploying a Project
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 First ``cd`` into your project's root, you can then deploy your project with the following::
 
@@ -91,10 +114,8 @@ command::
 
       scrapyd-deploy -a -p <project>
 
-.. _versioning:
-
 Versioning
-----------
+~~~~~~~~~~
 
 By default, ``scrapyd-deploy`` uses the current timestamp for generating the project version, as
 shown above. However, you can pass a custom version using ``--version``::
@@ -118,10 +139,8 @@ the version parameter by adding it to your target's entry in ``scrapy.cfg``::
 
 .. _LooseVersion: http://epydoc.sourceforge.net/stdlib/distutils.version.LooseVersion-class.html
 
-.. _local-settings:
-
 Local Settings
---------------
+~~~~~~~~~~~~~~
 
 You may want to keep certain settings local and not have them deployed to Scrapyd. To accomplish
 this you can create a ``local_settings.py`` file at the root of your project, where your
@@ -135,10 +154,8 @@ this you can create a ``local_settings.py`` file at the root of your project, wh
 ``scrapyd-deploy`` doesn't deploy anything outside of the project module, so the
 ``local_settings.py`` file won't be deployed.
 
-.. _egg-caveats:
-
 Egg Caveats
------------
+~~~~~~~~~~~
 
 Some things to keep in mind when building eggs for your Scrapy project:
 
@@ -153,3 +170,34 @@ Some things to keep in mind when building eggs for your Scrapy project:
 
 .. _pkgutil.get_data: http://docs.python.org/library/pkgutil.html#pkgutil.get_data
 .. _tempfile: http://docs.python.org/library/tempfile.html
+
+
+Global settings
+---------------
+
+Targets
+~~~~~~~
+
+You can define Scrapyd targets in your project's ``scrapy.cfg`` file. Example::
+
+    [deploy:example]
+    url = http://scrapyd.example.com/api/scrapyd
+    username = scrapy
+    password = secret
+
+While your target needs to be defined with its URL in ``scrapy.cfg``,
+you can use netrc_ for username and password, like so::
+
+    machine scrapyd.example.com
+        username scrapy
+        password secret
+
+If you want to list all available targets, you can use the ``-l`` option::
+
+    scrapyd-deploy -l
+
+To list projects available on a specific target, use the ``-L`` option::
+
+    scrapyd-deploy -L example
+
+.. _netrc: https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html
