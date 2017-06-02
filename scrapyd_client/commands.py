@@ -31,7 +31,7 @@ def schedule(args):
         _spiders = lib.get_spiders(args.target, project, args.spider)
         for spider in _spiders:
             job_id = lib.schedule(args.target, project, spider, job_args)
-            print(job_id)
+            print('{} / {} => {}'.format(project, spider, job_id))
 
 
 def spiders(args):

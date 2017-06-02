@@ -27,4 +27,4 @@ def test_schedule(mocker, script_runner):
 
     assert result.success, result.stdout + '\n' + result.stderr
     assert not result.stderr, result.stderr
-    assert result.stdout == '42\n'
+    assert result.stdout == 'foo / bar => 42\n'
