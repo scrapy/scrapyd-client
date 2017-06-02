@@ -1,7 +1,15 @@
+from os.path import dirname, join
 import sys
 
 import requests
 from scrapy.utils.conf import get_config as get_scrapy_config
+
+
+with open(join(dirname(__file__), 'VERSION'), 'rt') as f:
+    VERSION = f.readline().strip()
+
+HEADERS = requests.utils.default_headers().copy()
+HEADERS['User-Agent'] = 'Scrapyd-client/{}'.format(VERSION)
 
 
 class ErrorResponse(Exception):
@@ -73,7 +81,7 @@ def get_request(url, params={}):
         :returns: The processed response.
         :rtype: mapping
     """
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     return _process_response(response)
 
 
@@ -85,7 +93,7 @@ def post_request(url, data):
         :returns: The processed response.
         :rtype: mapping
     """
-    response = requests.post(url, data=data)
+    response = requests.post(url, data=data, headers=HEADERS)
     return _process_response(response)
 
 
