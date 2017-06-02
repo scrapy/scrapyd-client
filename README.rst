@@ -17,6 +17,7 @@ scrapyd-client
 For a reference on each subcommand invoke ``scrapyd-client <subcommand> --help``.
 
 Where filtering with wildcards is possible, it is facilitated with fnmatch_.
+The ``--project`` option can be omitted if one is found in a ``scrapy.cfg``.
 
 .. _fnmatch: https://docs.python.org/library/fnmatch.html
 
@@ -44,9 +45,9 @@ Schedules one or more spiders to be executed::
    # schedules any spider
    scrapyd-client schedule
    # schedules all spiders from the 'knowledge' project
-   scrapyd-client schedule knowledge
-   # schedules any spider whose name ends with '_daily'
-   scrapyd-client schedule * *_daily
+   scrapyd-client schedule -p knowledge \*
+   # schedules any spider from any project whose name ends with '_daily'
+   scrapyd-client schedule -p \* *_daily
 
 spiders
 ~~~~~~~
@@ -56,9 +57,7 @@ Lists spiders of one or more projects::
    # lists all spiders
    scrapyd-client spiders
    # lists all spiders from the 'knowledge' project
-   scrapyd-client spiders knowledge
-   # lists all spiders from the 'knowledge' project whose name ends with '_monthly'
-   scrapyd-client spiders knowledge *_monthly
+   scrapyd-client spiders -p knowledge
 
 
 scrapyd-deploy

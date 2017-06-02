@@ -23,7 +23,7 @@ def test_schedule(mocker, script_runner):
     mock_post = mocker.patch('scrapyd_client.utils.requests.post', autospec=True)
     mock_post.return_value = mock_post_response
 
-    result = script_runner.run('scrapyd-client', 'schedule', 'foo', 'bar')
+    result = script_runner.run('scrapyd-client', 'schedule', '-p', 'foo', 'bar')
 
     assert result.success, result.stdout + '\n' + result.stderr
     assert not result.stderr, result.stderr

@@ -16,7 +16,13 @@ ISSUE_TRACKER_URL = 'https://github.com/scrapy/scrapyd-client/issues'
 
 def parse_cli_args(args):
     target_default = get_config('deploy', 'url', fallback=DEFAULT_TARGET_URL).rstrip('/')
-    project_default = get_config('deploy', 'project', fallback='*')
+    project_default = get_config('deploy', 'project', fallback=None)
+    project_kwargs = {
+        'metavar': 'PROJECT', 'required': True,
+        'help': 'Specifies the project, can be a globbing pattern.'
+    }
+    if project_default:
+        project_kwargs['default'] = project_default
 
     description = 'A command line interface for Scrapyd.'
     mainparser = ArgumentParser(description=description)
@@ -32,20 +38,18 @@ def parse_cli_args(args):
 
     parser = subparsers.add_parser('schedule', description=commands.schedule.__doc__)
     parser.set_defaults(action=commands.schedule)
-    parser.add_argument('project', nargs='?', default=project_default, metavar='PROJECT',
-                        help='Specifies the project, can be a globbing pattern.')
-    parser.add_argument('spider', nargs='?', default='*', metavar='SPIDER',
+    parser.add_argument('-p', '--project', **project_kwargs)
+    parser.add_argument('spider', metavar='SPIDER',
                         help='Specifies the spider, can be a globbing pattern.')
     parser.add_argument('--arg', action='append', default=[],
                         help='Additional argument (key=value), can be specified multiple times.')
 
     parser = subparsers.add_parser('spiders', description=commands.spiders.__doc__)
     parser.set_defaults(action=commands.spiders)
-    parser.add_argument('project', nargs='?', default='*', metavar='PROJECT',
-                        help='Specifies the project, can be a globbing pattern.')
+    parser.add_argument('-p', '--project', **project_kwargs)
     parser.add_argument('-v', '--verbose', action='store_true', default=False,
-                        help='Prints the project and spider in each line, intended for processing '
-                             'stdout in scripts.')
+                        help="Prints project's and spider's name in each line, intended for "
+                             "processing stdout in scripts.")
 
     # TODO remove next two lines when 'deploy' is moved to this module
     parsed_args, _ = mainparser.parse_known_args(args)
