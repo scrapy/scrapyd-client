@@ -24,4 +24,3 @@ def test_build_egg(tmpdir, script_runner):
     assert ret.success
     assert ret.stdout == ''
     assert 'Writing egg to myproj.egg' in ret.stderr
-

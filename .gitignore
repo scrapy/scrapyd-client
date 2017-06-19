@@ -4,3 +4,4 @@ dist
 build
 .tox/
 .cache/
+.coverage

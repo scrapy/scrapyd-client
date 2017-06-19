@@ -14,8 +14,9 @@ setup_args = {
     'maintainer_email': 'info@scrapy.org',
     'license': 'BSD',
     'packages': ['scrapyd_client'],
-    'entry_points':{
-        'console_scripts': ['scrapyd-deploy = scrapyd_client.deploy:main']
+    'entry_points': {
+        'console_scripts': ['scrapyd-deploy = scrapyd_client.deploy:main',
+                            'scrapyd-client = scrapyd_client.cli:main']
     },
     'include_package_data': True,
     'zip_safe': False,
@@ -24,6 +25,7 @@ setup_args = {
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Development Status :: 5 - Production/Stable',
@@ -37,6 +39,6 @@ try:
 except ImportError:
     from distutils.core import setup
 else:
-    setup_args['install_requires'] = ['Scrapy>=0.17', 'six']
+    setup_args['install_requires'] = ['requests', 'Scrapy>=0.17', 'six']
 
 setup(**setup_args)
