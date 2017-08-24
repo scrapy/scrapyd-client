@@ -20,3 +20,4 @@ deploy:
   on:
     tags: true
     repo: scrapy/scrapyd-client
+    condition: "$TRAVIS_PYTHON_VERSION == '3.6'"
