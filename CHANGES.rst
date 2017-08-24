@@ -1,6 +1,14 @@
 Changes
 =======
 
+1.2.0a1 (2017-08-24)
+--------------------
+
+- Install ``scrapyd-deploy`` as a console script.
+- New ``scrapy-client`` CLI with ``deploy``, ``projects``, ``spiders``,
+  and ``schedule`` subcommands.
+
+
 1.1.0 (2017-02-10)
 ------------------
 
