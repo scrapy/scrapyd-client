@@ -88,8 +88,11 @@ def main():
 
     if opts.build_egg:  # build egg only
         egg, tmpdir = _build_egg()
-        _log("Writing egg to %s" % opts.build_egg)
-        shutil.copyfile(egg, opts.build_egg)
+        dest = opts.build_egg
+        if(os.path.isdir(dest)):
+            dest = os.path.join(dest, str(int(time.time())) + '.egg')
+        _log("Writing egg to %s" % dest)
+        shutil.copyfile(egg, dest)
     elif opts.deploy_all_targets:
         version = None
         for name, target in _get_targets().items():
