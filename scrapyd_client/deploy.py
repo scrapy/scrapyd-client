@@ -249,7 +249,11 @@ def _http_post(request):
         return True
     except HTTPError as e:
         _log("Deploy failed (%s):" % e.code)
-        resp = e.read().decode('utf-8')
+        resp = e.read()
+        try:
+            resp = resp.decode('utf-8')
+        except UnicodeDecodeError:
+            pass
         try:
             d = json.loads(resp)
         except ValueError:
