@@ -113,9 +113,9 @@ command::
 
       scrapyd-deploy -a -p <project>
 
-how to include non-python files
-default::
+how to include non-python files::
 
+    default setup.py:
         setup(
             name         = 'project',
             version      = '1.0',
@@ -123,10 +123,10 @@ default::
             entry_points = {'scrapy': ['settings = projectname.settings']},
             )
 
-add in the setup.py
-E.g::
+add in the setup.py::
 
-    package_data={'projectname': ['tools/json/*.json']}
+    E.g:
+        package_data={'projectname': ['tools/json/*.json']}
 
 Versioning
 ~~~~~~~~~~
@@ -182,7 +182,7 @@ Some things to keep in mind when building eggs for your Scrapy project:
 
         use:
             pkgutil.get_data("projectName","tools/json/test.json")
-        replace
+        replace:
             open(os.path.join(os.path.abspath(os.path.dirname(__file__)),"json/test.json"),'r')
 
 * Be careful when writing to disk in your project, as Scrapyd will most likely be running under a
