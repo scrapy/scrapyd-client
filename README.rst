@@ -114,7 +114,7 @@ command::
       scrapyd-deploy -a -p <project>
 
 how to include non-python files
-    default setup.py::
+default::
 
         setup(
             name         = 'project',
@@ -123,8 +123,8 @@ how to include non-python files
             entry_points = {'scrapy': ['settings = projectname.settings']},
             )
 
-You need to add in the setup.py file
-        E.g::
+add in the setup.py
+E.g::
 
     package_data={'projectname': ['tools/json/*.json']}
 
