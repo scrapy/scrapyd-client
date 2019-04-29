@@ -116,6 +116,7 @@ command::
 how to include non-python files::
 
     default setup.py:
+        from setuptools import setup, find_packages
         setup(
             name         = 'project',
             version      = '1.0',
@@ -123,7 +124,7 @@ how to include non-python files::
             entry_points = {'scrapy': ['settings = projectname.settings']},
             )
 
-add in the setup.py::
+add in the setup::
 
     E.g:
         package_data={'projectname': ['tools/json/*.json']}
