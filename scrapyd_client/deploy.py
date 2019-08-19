@@ -20,7 +20,7 @@ from w3lib.form import encode_multipart
 import setuptools  # noqa: F401 not used in code but needed in runtime, don't remove!
 
 from scrapy.utils.project import inside_project
-from scrapy.utils.http import basic_auth_header
+from w3lib.http import basic_auth_header
 from scrapy.utils.python import retry_on_eintr
 from scrapy.utils.conf import get_config, closest_scrapy_cfg
 
