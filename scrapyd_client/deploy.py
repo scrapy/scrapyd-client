@@ -6,6 +6,8 @@ import glob
 import tempfile
 import shutil
 import time
+import ssl
+import certifi
 from six.moves.urllib.request import (build_opener, install_opener,
                                       HTTPRedirectHandler as UrllibHTTPRedirectHandler,
                                       Request, urlopen)
@@ -79,7 +81,7 @@ def main():
         target = _get_target(opts.list_projects)
         req = Request(_url(target, 'listprojects.json'))
         _add_auth_header(req, target)
-        f = urlopen(req)
+        f = urlopen(req, context=ssl.create_default_context(cafile=certifi.where()))
         projects = json.loads(f.read())['projects']
         print(os.linesep.join(projects))
         return
@@ -243,7 +245,7 @@ def _add_auth_header(request, target):
 
 def _http_post(request):
     try:
-        f = urlopen(request)
+        f = urlopen(request, context=ssl.create_default_context(cafile=certifi.where()))
         _log("Server response (%s):" % f.code)
         print(f.read().decode('utf-8'))
         return True
