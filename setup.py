@@ -8,7 +8,7 @@ setup_args = {
     'version': version,
     'url': 'https://github.com/scrapy/scrapyd-client',
     'description': 'A client for scrapyd',
-    'long_description': open('README.rst').read(),
+    'long_description': open(join(dirname(__file__), 'README.rst')).read(),
     'author': 'Scrapy developers',
     'maintainer': 'Scrapy developers',
     'maintainer_email': 'info@scrapy.org',
