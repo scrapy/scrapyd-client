@@ -146,6 +146,14 @@ Some things to keep in mind when building eggs for your Scrapy project:
 .. _pkgutil.get_data: https://docs.python.org/library/pkgutil.html#pkgutil.get_data
 .. _tempfile: https://docs.python.org/library/tempfile.html
 
+Including dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes your project will depend on third party libraries that are not available on scrapyd.  In this case,
+you may want to build your eggs with all your project dependencies. You will need to have a ``requirements.txt``
+file at the root of your project and use the ``--include-deps`` option when building or deploying your project.
+
+    scrapyd-deploy --include-deps
 
 scrapyd-client
 --------------
