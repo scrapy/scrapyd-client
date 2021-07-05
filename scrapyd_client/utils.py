@@ -1,3 +1,4 @@
+import errno
 from os.path import dirname, join
 import sys
 
@@ -95,6 +96,16 @@ def post_request(url, data):
     """
     response = requests.post(url, data=data, headers=HEADERS)
     return _process_response(response)
+
+
+def retry_on_eintr(function, *args, **kw):
+    """Run a function and retry it while getting EINTR errors"""
+    while True:
+        try:
+            return function(*args, **kw)
+        except IOError as e:
+            if e.errno != errno.EINTR:
+                raise
 
 
 __all__ = [

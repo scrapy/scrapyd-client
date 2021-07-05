@@ -21,8 +21,8 @@ import setuptools  # noqa: F401 not used in code but needed in runtime, don't re
 
 from scrapy.utils.project import inside_project
 from scrapy.utils.http import basic_auth_header
-from scrapy.utils.python import retry_on_eintr
 from scrapy.utils.conf import get_config, closest_scrapy_cfg
+from scrapyd_client.utils import retry_on_eintr
 
 _SETUP_PY_TEMPLATE = """
 # Automatically created by: scrapyd-deploy
