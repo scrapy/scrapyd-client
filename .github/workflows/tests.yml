@@ -3,10 +3,13 @@ on: [push, pull_request]
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: [3.6, 3.7, 3.8, 3.9, pypy-3.7]
         include:
         - python-version: 3.6
           env:
@@ -20,6 +23,14 @@ jobs:
         - python-version: 3.9
           env:
             TOXENV: py
+        - python-version: pypy-3.7
+          env:
+            TOXENV: pypy
+        # It is difficult to install libxml2 and libxslt development packages on Windows.
+        # https://www.lfd.uci.edu/~gohlke/pythonlibs/ distributes a wheel, but the URL changes.
+        exclude:
+          - os: windows-latest
+            python-version: pypy-3.7
 
     steps:
     - uses: actions/checkout@v2
@@ -29,6 +40,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Install libxml2 and libxslt development packages
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == 'pypy-3.7'
+      run: sudo apt install libxml2-dev libxslt-dev
+
     - name: Run tests
       env: ${{ matrix.env }}
       run: |
@@ -36,4 +51,5 @@ jobs:
         tox
 
     - name: Upload coverage report
+      if: matrix.os == 'ubuntu-latest'
       run: bash <(curl -s https://codecov.io/bash)
