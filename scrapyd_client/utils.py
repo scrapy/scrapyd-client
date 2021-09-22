@@ -81,5 +81,6 @@ __all__ = [
     MalformedRespone.__name__,
     get_request.__name__,
     indent.__name__,
-    post_request.__name__
+    post_request.__name__,
+    retry_on_eintr.__name__
 ]
