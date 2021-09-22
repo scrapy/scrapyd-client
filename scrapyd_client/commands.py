@@ -31,7 +31,7 @@ def schedule(args):
         _spiders = lib.get_spiders(args.target, project, args.spider)
         for spider in _spiders:
             job_id = lib.schedule(args.target, project, spider, job_args)
-            print('{} / {} => {}'.format(project, spider, job_id))
+            print(f'{project} / {spider} => {job_id}')
 
 
 def spiders(args):
@@ -40,10 +40,10 @@ def spiders(args):
     for project in _projects:
         project_spiders = lib.get_spiders(args.target, project)
         if not args.verbose:
-            print('{}:'.format(project))
+            print(f'{project}:')
             if project_spiders:
                 print(indent('\n'.join(project_spiders), INDENT_PREFIX))
             else:
                 print(INDENT_PREFIX + 'No spiders.')
         elif project_spiders:
-            print('\n'.join('{} {}'.format(project, x) for x in project_spiders))
+            print('\n'.join(f'{project} {x}' for x in project_spiders))
