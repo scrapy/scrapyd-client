@@ -26,6 +26,11 @@ jobs:
         - python-version: pypy-3.7
           env:
             TOXENV: pypy
+        # It is difficult to install libxml2 and libxslt development packages on Windows.
+        # https://www.lfd.uci.edu/~gohlke/pythonlibs/ distributes a wheel, but the URL changes.
+        exclude:
+          - os: windows-latest
+            python-version: pypy-3.7
 
     steps:
     - uses: actions/checkout@v2
@@ -35,13 +40,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install libxml2 and libxslt development packages on Ubuntu
+    - name: Install libxml2 and libxslt development packages
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == 'pypy-3.7'
       run: sudo apt install libxml2-dev libxslt-dev
-    # https://www.lfd.uci.edu/~gohlke/pythonlibs/
-    - name: Install libxml2 and libxslt development packages on Windows
-      if: matrix.os == 'windows-latest' && matrix.python-version == 'pypy-3.7'
-      run: pip install https://download.lfd.uci.edu/pythonlibs/y2rycu7g/lxml-4.6.3-pp37-pypy37_pp73-win_amd64.whl
 
     - name: Run tests
       env: ${{ matrix.env }}
