@@ -1,3 +1,4 @@
+import errno
 from json.decoder import JSONDecodeError
 from os.path import dirname, join
 from textwrap import indent
@@ -65,10 +66,21 @@ def post_request(url, data):
     return _process_response(response)
 
 
+def retry_on_eintr(function, *args, **kw):
+    """Run a function and retry it while getting EINTR errors"""
+    while True:
+        try:
+            return function(*args, **kw)
+        except IOError as e:
+            if e.errno != errno.EINTR:
+                raise
+
+
 __all__ = [
     ErrorResponse.__name__,
     MalformedRespone.__name__,
     get_request.__name__,
     indent.__name__,
-    post_request.__name__
+    post_request.__name__,
+    retry_on_eintr.__name__
 ]
