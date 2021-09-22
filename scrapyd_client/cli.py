@@ -5,9 +5,10 @@ from argparse import ArgumentParser
 from traceback import print_exc
 
 from requests.exceptions import ConnectionError
+from scrapy.utils.conf import get_config
 
 from scrapyd_client import commands
-from scrapyd_client.utils import ErrorResponse, MalformedRespone, get_config
+from scrapyd_client.utils import ErrorResponse, MalformedRespone
 
 
 DEFAULT_TARGET_URL = 'http://localhost:6800'
@@ -15,8 +16,10 @@ ISSUE_TRACKER_URL = 'https://github.com/scrapy/scrapyd-client/issues'
 
 
 def parse_cli_args(args):
-    target_default = get_config('deploy', 'url', fallback=DEFAULT_TARGET_URL).rstrip('/')
-    project_default = get_config('deploy', 'project', fallback=None)
+    cfg = get_config()
+
+    target_default = cfg.get('deploy', 'url', fallback=DEFAULT_TARGET_URL).rstrip('/')
+    project_default = cfg.get('deploy', 'project', fallback=None)
     project_kwargs = {
         'metavar': 'PROJECT', 'required': True,
         'help': 'Specifies the project, can be a globbing pattern.'
@@ -73,7 +76,7 @@ def main():
     except SystemExit as e:
         exit_code = e.code
     except ConnectionError as e:
-        print('Failed to connect to target ({}):'.format(args.target))
+        print(f'Failed to connect to target ({args.target}):')
         print(e)
         exit_code = 1
     except ErrorResponse as e:
@@ -88,7 +91,7 @@ def main():
         print(text)
         exit_code = 1
     except Exception:
-        print('Caught unhandled exception, please report at {}'.format(ISSUE_TRACKER_URL))
+        print(f'Caught unhandled exception, please report at {ISSUE_TRACKER_URL}')
         print_exc()
         exit_code = 3
     else:
