@@ -6,23 +6,23 @@ import glob
 import tempfile
 import shutil
 import time
-from six.moves.urllib.request import (build_opener, install_opener,
-                                      HTTPRedirectHandler as UrllibHTTPRedirectHandler,
-                                      Request, urlopen)
-from six.moves.urllib.error import HTTPError, URLError
 import netrc
 import json
 from optparse import OptionParser
-from six.moves.urllib.parse import urlparse, urljoin
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlparse, urljoin
+from urllib.request import (build_opener, install_opener,
+                            HTTPRedirectHandler as UrllibHTTPRedirectHandler, Request, urlopen)
 from subprocess import Popen, PIPE, check_call
 
 from w3lib.form import encode_multipart
+from w3lib.http import basic_auth_header
 import setuptools  # noqa: F401 not used in code but needed in runtime, don't remove!
 
 from scrapy.utils.project import inside_project
-from scrapy.utils.http import basic_auth_header
-from scrapy.utils.python import retry_on_eintr
 from scrapy.utils.conf import get_config, closest_scrapy_cfg
+
+from scrapyd_client.utils import retry_on_eintr
 
 _SETUP_PY_TEMPLATE = """
 # Automatically created by: scrapyd-deploy
@@ -245,11 +245,11 @@ def _http_post(request):
     try:
         f = urlopen(request)
         _log("Server response (%s):" % f.code)
-        print(f.read().decode('utf-8'))
+        print(f.read().decode())
         return True
     except HTTPError as e:
         _log("Deploy failed (%s):" % e.code)
-        resp = e.read().decode('utf-8')
+        resp = e.read().decode()
         try:
             d = json.loads(resp)
         except ValueError:

@@ -1,6 +1,15 @@
 Changes
 =======
 
+2.0.0 (Unreleased)
+------------------
+
+- Add support for Scrapy 2.5.
+- Add support for Python 3.7, 3.8, 3.9, PyPy3.7.
+- Drop support for Python 2.7, 3.4, 3.5.
+- Remove ``scrapyd_client.utils.get_config``, which was a compatibility wrapper for Python 2.7.
+
+
 1.2.0a1 (2017-08-24)
 --------------------
 

@@ -1,15 +1,16 @@
+import errno
+from json.decoder import JSONDecodeError
 from os.path import dirname, join
-import sys
+from textwrap import indent
 
 import requests
-from scrapy.utils.conf import get_config as get_scrapy_config
 
 
 with open(join(dirname(__file__), 'VERSION'), 'rt') as f:
     VERSION = f.readline().strip()
 
 HEADERS = requests.utils.default_headers().copy()
-HEADERS['User-Agent'] = 'Scrapyd-client/{}'.format(VERSION)
+HEADERS['User-Agent'] = f'Scrapyd-client/{VERSION}'
 
 
 class ErrorResponse(Exception):
@@ -20,38 +21,6 @@ class ErrorResponse(Exception):
 class MalformedRespone(Exception):
     """ Raised when the response can't be decoded. """
     pass
-
-
-if sys.version_info < (3,):
-    from ConfigParser import NoOptionError, NoSectionError
-else:
-    from configparser import NoOptionError, NoSectionError
-
-
-if sys.version_info < (3, 3):
-    def indent(s, prefix):
-        return '\n'.join(prefix + x for x in s.splitlines())
-else:
-    from textwrap import indent  # noqa: F401
-
-
-if sys.version_info < (3, 5):
-    JSONDecodeError = ValueError
-else:
-    from json.decoder import JSONDecodeError
-
-
-scrapy_config = get_scrapy_config()
-
-
-def get_config(section, option, fallback):
-    """ Compatibilty wrapper for Python 2.7 which lacks the fallback parameter
-        in :meth:`ConfigParser.ConfigParser.get`. """
-    # TODO remove when Python 2 support is dropped.
-    try:
-        return scrapy_config.get(section, option)
-    except (NoOptionError, NoSectionError):
-        return fallback
 
 
 def _process_response(response):
@@ -67,7 +36,7 @@ def _process_response(response):
     elif status == 'error':
         raise ErrorResponse(response['message'])
     else:
-        raise RuntimeError('Unhandled response status: {}'.format(status))
+        raise RuntimeError(f'Unhandled response status: {status}')
 
     return response
 
@@ -97,11 +66,21 @@ def post_request(url, data):
     return _process_response(response)
 
 
+def retry_on_eintr(function, *args, **kw):
+    """Run a function and retry it while getting EINTR errors"""
+    while True:
+        try:
+            return function(*args, **kw)
+        except IOError as e:
+            if e.errno != errno.EINTR:
+                raise
+
+
 __all__ = [
     ErrorResponse.__name__,
     MalformedRespone.__name__,
-    get_config.__name__,
     get_request.__name__,
     indent.__name__,
-    post_request.__name__
+    post_request.__name__,
+    retry_on_eintr.__name__
 ]
