@@ -2,69 +2,25 @@
 Scrapyd-client
 ==============
 
-.. image:: https://secure.travis-ci.org/scrapy/scrapyd-client.png?branch=master
-   :target: http://travis-ci.org/scrapy/scrapyd-client
+|PyPI Version| |Build Status| |Coverage Status| |Python Version|
 
-Scrapyd-client is a client for Scrapyd_. It provides ``scrapyd-client`` and ``scrapyd-deploy``
-utilities, which allow you to interact with and deploy your project to a Scrapyd server.
+Scrapyd-client is a client for Scrapyd_. It provides:
+
+-  ``scrapyd-deploy``, to deploy your project to a Scrapyd server
+-  ``scrapyd-client``, to interact with your project once deployed
 
 .. _Scrapyd: https://scrapyd.readthedocs.io
-
-
-scrapyd-client
---------------
-
-For a reference on each subcommand invoke ``scrapyd-client <subcommand> --help``.
-
-Where filtering with wildcards is possible, it is facilitated with fnmatch_.
-The ``--project`` option can be omitted if one is found in a ``scrapy.cfg``.
-
-.. _fnmatch: https://docs.python.org/library/fnmatch.html
-
-deploy
-~~~~~~
-
-At the moment this is a wrapper around `scrapyd-deploy`_. Note that the command line options
-of this one are likely to change.
-
-projects
-~~~~~~~~
-
-Lists all projects of a Scrapyd instance::
-
-   # lists all projects on the default target
-   scrapyd-client projects
-   # lists all projects from a custom URL
-   scrapyd-client -t http://scrapyd.example.net projects
-
-schedule
-~~~~~~~~
-
-Schedules one or more spiders to be executed::
-
-   # schedules any spider
-   scrapyd-client schedule
-   # schedules all spiders from the 'knowledge' project
-   scrapyd-client schedule -p knowledge \*
-   # schedules any spider from any project whose name ends with '_daily'
-   scrapyd-client schedule -p \* \*_daily
-
-spiders
-~~~~~~~
-
-Lists spiders of one or more projects::
-
-   # lists all spiders
-   scrapyd-client spiders
-   # lists all spiders from the 'knowledge' project
-   scrapyd-client spiders -p knowledge
+.. |PyPI Version| image:: https://img.shields.io/pypi/v/scrapyd-client.svg
+   :target: https://pypi.org/project/scrapyd-client/
+.. |Build Status| image:: https://github.com/scrapy/scrapyd-client/workflows/Tests/badge.svg
+.. |Coverage Status| image:: https://codecov.io/gh/scrapy/scrapyd-client/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/scrapy/scrapyd-client
+.. |Python Version| image:: https://img.shields.io/pypi/pyversions/scrapyd-client.svg
+   :target: https://pypi.org/project/scrapyd-client/
 
 
 scrapyd-deploy
 --------------
-
-How It Works
-~~~~~~~~~~~~
 
 Deploying your project to a Scrapyd server typically involves two steps:
 
@@ -74,7 +30,7 @@ Deploying your project to a Scrapyd server typically involves two steps:
 The ``scrapyd-deploy`` tool automates the process of building the egg and pushing it to the target
 Scrapyd server.
 
-.. _addversion.json:  https://scrapyd.readthedocs.org/en/latest/api.html#addversion-json
+.. _addversion.json: https://scrapyd.readthedocs.org/en/latest/api.html#addversion-json
 .. _Eggifying: http://peak.telecommunity.com/DevCenter/PythonEggs
 .. _setuptools: https://pypi.python.org/pypi/setuptools
 
@@ -187,8 +143,57 @@ Some things to keep in mind when building eggs for your Scrapy project:
    different user which may not have write access to certain directories. If you can, avoid writing
    to disk and always use tempfile_ for temporary files.
 
-.. _pkgutil.get_data: http://docs.python.org/library/pkgutil.html#pkgutil.get_data
-.. _tempfile: http://docs.python.org/library/tempfile.html
+.. _pkgutil.get_data: https://docs.python.org/library/pkgutil.html#pkgutil.get_data
+.. _tempfile: https://docs.python.org/library/tempfile.html
+
+
+scrapyd-client
+--------------
+
+For a reference on each subcommand invoke ``scrapyd-client <subcommand> --help``.
+
+Where filtering with wildcards is possible, it is facilitated with fnmatch_.
+The ``--project`` option can be omitted if one is found in a ``scrapy.cfg``.
+
+.. _fnmatch: https://docs.python.org/library/fnmatch.html
+
+deploy
+~~~~~~
+
+At the moment this is a wrapper around `scrapyd-deploy`_. Note that the command line options
+of this one are likely to change.
+
+projects
+~~~~~~~~
+
+Lists all projects of a Scrapyd instance::
+
+   # lists all projects on the default target
+   scrapyd-client projects
+   # lists all projects from a custom URL
+   scrapyd-client -t http://scrapyd.example.net projects
+
+schedule
+~~~~~~~~
+
+Schedules one or more spiders to be executed::
+
+   # schedules any spider
+   scrapyd-client schedule
+   # schedules all spiders from the 'knowledge' project
+   scrapyd-client schedule -p knowledge \*
+   # schedules any spider from any project whose name ends with '_daily'
+   scrapyd-client schedule -p \* \*_daily
+
+spiders
+~~~~~~~
+
+Lists spiders of one or more projects::
+
+   # lists all spiders
+   scrapyd-client spiders
+   # lists all spiders from the 'knowledge' project
+   scrapyd-client spiders -p knowledge
 
 
 .. _scrapy-config-file:
