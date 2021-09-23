@@ -92,7 +92,6 @@ Then, set the ``package_data`` keyword argument in the ``setup()`` function call
 ``setup.py`` file. Example (note: ``projectname`` would be your project's name)::
 
 .. code-block:: python
-   :emphasize-lines: 8
 
    from setuptools import setup, find_packages
 
@@ -130,10 +129,6 @@ By default, ``scrapyd-deploy`` uses the current timestamp for generating the pro
 shown above. However, you can pass a custom version using ``--version``::
 
    scrapyd-deploy <target> -p <project> --version <version>
-
-Or for all targets::
-
-   scrapyd-deploy -a -p <project> --version <version>
 
 The version must be comparable with LooseVersion_. Scrapyd will use the greatest version unless
 specified.
