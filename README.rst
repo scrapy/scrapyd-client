@@ -89,9 +89,10 @@ If you don't have a ``setup.py`` file, create one with::
    scrapyd-deploy --build-egg=/dev/null
 
 Then, set the ``package_data`` keyword argument in the ``setup()`` function call in the
-``setup.py`` file. Example (note: ``projectname`` would be your project's name)::
+``setup.py`` file. Example (note: ``projectname`` would be your project's name):
 
 .. code-block:: python
+   :emphasize-lines: 8
 
    from setuptools import setup, find_packages
 
