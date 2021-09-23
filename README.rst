@@ -92,7 +92,6 @@ Then, set the ``package_data`` keyword argument in the ``setup()`` function call
 ``setup.py`` file. Example (note: ``projectname`` would be your project's name):
 
 .. code-block:: python
-   :emphasize-lines: 8
 
    from setuptools import setup, find_packages
 
