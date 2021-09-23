@@ -199,47 +199,51 @@ Scrapy configuration file
 Targets
 ~~~~~~~
 
-You can define a Scrapyd target in your project's ``scrapy.cfg`` file. Example::
+You can define a Scrapyd target in your project's ``scrapy.cfg`` file. Example:
 
-    [deploy]
-    url = http://scrapyd.example.com/api/scrapyd
-    username = scrapy
-    password = secret
-    project = projectname
+.. code-block:: ini
+
+   [deploy]
+   url = http://scrapyd.example.com/api/scrapyd
+   username = scrapy
+   password = secret
+   project = projectname
 
 You can now deploy your project without the ``<target>`` argument or ``-p <project>`` option::
 
-    scrapyd-deploy
+   scrapyd-deploy
 
-If you have multiple targets, add the target name in the section name. Example::
+If you have multiple targets, add the target name in the section name. Example:
 
-    [deploy:targetname]
-    url = http://scrapyd.example.com/api/scrapyd
+.. code-block:: ini
 
-    [deploy:another]
-    url = http://other.example.com/api/scrapyd
+   [deploy:targetname]
+   url = http://scrapyd.example.com/api/scrapyd
+
+   [deploy:another]
+   url = http://other.example.com/api/scrapyd
 
 To deploy to one target, run::
 
-    scrapyd-deploy targetname -p <project>
+   scrapyd-deploy targetname -p <project>
 
 To deploy to all targets, use the ``-a`` option::
 
-    scrapyd-deploy -a -p <project>
+   scrapyd-deploy -a -p <project>
 
 To list all available targets, use the ``-l`` option::
 
-    scrapyd-deploy -l
+   scrapyd-deploy -l
 
 To list all available projects on one target, use the ``-L`` option::
 
-    scrapyd-deploy -L example
+   scrapyd-deploy -L example
 
 While your target needs to be defined with its URL in ``scrapy.cfg``,
 you can use netrc_ for username and password, like so::
 
-    machine scrapyd.example.com
-        username scrapy
-        password secret
+   machine scrapyd.example.com
+       username scrapy
+       password secret
 
 .. _netrc: https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html
