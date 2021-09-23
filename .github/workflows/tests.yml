@@ -53,3 +53,8 @@ jobs:
     - name: Upload coverage report
       if: matrix.os == 'ubuntu-latest'
       run: bash <(curl -s https://codecov.io/bash)
+
+    - name: Check MANIFEST.in
+      run: |
+        pip install -U check-manifest setuptools
+        check-manifest

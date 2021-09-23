@@ -1,5 +1,6 @@
-include CHANGES.rst
-include README.rst
+include *.rst
 include LICENSE
-include MANIFEST.in
 include scrapyd_client/VERSION
+include tox.ini
+recursive-include tests *.py
+exclude .bumpversion.cfg
