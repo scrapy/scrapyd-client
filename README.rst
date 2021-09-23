@@ -160,8 +160,7 @@ The ``--project`` option can be omitted if one is found in a ``scrapy.cfg``.
 deploy
 ~~~~~~
 
-At the moment this is a wrapper around `scrapyd-deploy`_. Note that the command line options
-of this one are likely to change.
+This is a wrapper around `scrapyd-deploy`_.
 
 projects
 ~~~~~~~~
