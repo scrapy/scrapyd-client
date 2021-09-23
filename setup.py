@@ -1,27 +1,53 @@
-from os.path import join, dirname
+import os.path
 
-with open(join(dirname(__file__), 'scrapyd_client/VERSION')) as f:
+from setuptools import find_packages, setup
+
+
+with open('README.rst') as f:
+    readme = f.read()
+
+with open(os.path.join('scrapyd_client', 'VERSION')) as f:
     version = f.read().strip()
 
-setup_args = {
-    'name': 'scrapyd-client',
-    'version': version,
-    'url': 'https://github.com/scrapy/scrapyd-client',
-    'description': 'A client for scrapyd',
-    'long_description': open('README.rst').read(),
-    'author': 'Scrapy developers',
-    'maintainer': 'Scrapy developers',
-    'maintainer_email': 'info@scrapy.org',
-    'license': 'BSD',
-    'packages': ['scrapyd_client'],
-    'python_requires': '>=3.6',
-    'entry_points': {
-        'console_scripts': ['scrapyd-deploy = scrapyd_client.deploy:main',
-                            'scrapyd-client = scrapyd_client.cli:main']
+setup(
+    name='scrapyd-client',
+    version=version,
+    description='A client for Scrapyd',
+    long_description=readme,
+    author='Scrapy developers',
+    author_email='info@scrapy.org',
+    url='https://github.com/scrapy/scrapyd-client',
+    packages=find_packages(exclude=('tests', 'tests.*')),
+    include_package_data=True,
+    install_requires=[
+        'requests',
+        'scrapy>=0.17',
+        'w3lib',
+    ],
+    extras_require={
+        'test': [
+            'pytest',
+            'pytest-console-scripts',
+            'pytest-cov',
+            'pytest-mock',
+        ]
     },
-    'include_package_data': True,
-    'zip_safe': False,
-    'classifiers': [
+    python_requires='>=3.6',
+    license='BSD',
+    zip_safe=False,
+    entry_points={
+        'console_scripts': [
+            'scrapyd-deploy = scrapyd_client.deploy:main',
+            'scrapyd-client = scrapyd_client.cli:main',
+        ]
+    },
+    classifiers=[
+        'Framework :: Scrapy',
+        'Development Status :: 5 - Production/Stable',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
@@ -30,19 +56,6 @@ setup_args = {
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
-        'License :: OSI Approved :: BSD License',
-        'Operating System :: OS Independent',
-        'Development Status :: 5 - Production/Stable',
-        'Environment :: Console',
         'Topic :: Internet :: WWW/HTTP',
     ],
-}
-
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-else:
-    setup_args['install_requires'] = ['requests', 'Scrapy>=0.17']
-
-setup(**setup_args)
+)

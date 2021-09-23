@@ -1,3 +1,0 @@
-pytest-console-scripts
-pytest-mock
-tox
