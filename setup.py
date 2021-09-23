@@ -6,6 +6,9 @@ from setuptools import find_packages, setup
 with open('README.rst', encoding='utf-8') as f:
     readme = f.read()
 
+with open('CHANGES.rst', encoding='utf-8') as f:
+    history = f.read()
+
 with open(os.path.join('scrapyd_client', 'VERSION')) as f:
     version = f.read().strip()
 
@@ -13,7 +16,7 @@ setup(
     name='scrapyd-client',
     version=version,
     description='A client for Scrapyd',
-    long_description=readme,
+    long_description=readme + '\n\n' + history,
     long_description_content_type='text/x-rst',
     author='Scrapy developers',
     author_email='info@scrapy.org',
