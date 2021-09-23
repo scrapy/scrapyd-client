@@ -14,6 +14,7 @@ setup(
     version=version,
     description='A client for Scrapyd',
     long_description=readme,
+    long_description_content_type='text/x-rst',
     author='Scrapy developers',
     author_email='info@scrapy.org',
     url='https://github.com/scrapy/scrapyd-client',

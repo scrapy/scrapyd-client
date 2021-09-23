@@ -76,7 +76,7 @@ If successful you should see a JSON response similar to the following::
    {"status": "ok", "spiders": ["spider1", "spider2"]}
 
 To save yourself from having to specify the target and project, you can set the defaults in the
-:ref:`scrapy-config-file`.
+`Scrapy configuration file`_.
 
 Versioning
 ~~~~~~~~~~
@@ -195,8 +195,6 @@ Lists spiders of one or more projects::
    # lists all spiders from the 'knowledge' project
    scrapyd-client spiders -p knowledge
 
-
-.. _scrapy-config-file:
 
 Scrapy configuration file
 -------------------------
