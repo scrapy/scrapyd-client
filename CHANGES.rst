@@ -1,7 +1,7 @@
 Changes
 =======
 
-2.0.0 (Unreleased)
+1.2.0 (Unreleased)
 ------------------
 
 - Add support for Scrapy 2.5.
