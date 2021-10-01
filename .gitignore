@@ -2,6 +2,7 @@
 *egg-info
 dist
 build
+htmlcov
 .tox/
 .cache/
 .coverage
