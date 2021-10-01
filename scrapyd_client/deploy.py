@@ -15,8 +15,8 @@ from urllib.request import (build_opener, install_opener,
                             HTTPRedirectHandler as UrllibHTTPRedirectHandler, Request, urlopen)
 from subprocess import Popen, PIPE, check_call
 
-from w3lib.form import encode_multipart
 from w3lib.http import basic_auth_header
+from urllib3.filepost import encode_multipart_formdata
 import setuptools  # noqa: F401 not used in code but needed in runtime, don't remove!
 
 from scrapy.utils.project import inside_project
@@ -207,10 +207,10 @@ def _upload_egg(target, eggpath, project, version):
         'version': version,
         'egg': ('project.egg', eggdata),
     }
-    body, boundary = encode_multipart(data)
+    body, content_type = encode_multipart_formdata(data)
     url = _url(target, 'addversion.json')
     headers = {
-        'Content-Type': 'multipart/form-data; boundary=%s' % boundary,
+        'Content-Type': content_type,
         'Content-Length': str(len(body)),
     }
     req = Request(url, body, headers)

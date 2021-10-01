@@ -1,6 +1,13 @@
 History
 -------
 
+Unreleased
+~~~~~~~~~~
+
+- Address deprecation warnings.
+- Add dependency on ``urllib3``.
+
+
 1.2.0 (2021-10-01)
 ~~~~~~~~~~~~~~~~~~
 
