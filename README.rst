@@ -95,7 +95,7 @@ the version parameter by adding it to your target's entry in ``scrapy.cfg``:
 
 .. code-block:: ini
 
-   [deploy:target]
+   [deploy]
    ...
    version = HG
 
