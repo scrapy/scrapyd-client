@@ -1,7 +1,7 @@
 History
 -------
 
-1.2.0 (Unreleased)
+1.2.0 (2021-10-01)
 ~~~~~~~~~~~~~~~~~~
 
 - Add support for Scrapy 2.5.
