@@ -6,7 +6,7 @@ from requests.exceptions import ConnectionError
 from scrapy.utils.conf import get_config
 
 from scrapyd_client import commands
-from scrapyd_client.utils import ErrorResponse, MalformedRespone
+from scrapyd_client.utils import ErrorResponse, MalformedResponse
 
 
 DEFAULT_TARGET_URL = 'http://localhost:6800'
@@ -81,7 +81,7 @@ def main():
         print('Scrapyd responded with an error:')
         print(e)
         exit_code = 1
-    except MalformedRespone as e:
+    except MalformedResponse as e:
         text = str(e)
         if len(text) > 120:
             text = text[:50] + ' [...] ' + text[-50:]

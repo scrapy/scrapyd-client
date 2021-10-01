@@ -14,7 +14,7 @@ History
 ~~~~~~~~~~~~~~~~~~~~
 
 - Install ``scrapyd-deploy`` as a console script.
-- New ``scrapy-client`` CLI with ``deploy``, ``projects``, ``spiders``,
+- New ``scrapyd-client`` CLI with ``deploy``, ``projects``, ``spiders``,
   and ``schedule`` subcommands.
 
 

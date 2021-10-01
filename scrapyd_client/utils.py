@@ -18,7 +18,7 @@ class ErrorResponse(Exception):
     pass
 
 
-class MalformedRespone(Exception):
+class MalformedResponse(Exception):
     """ Raised when the response can't be decoded. """
     pass
 
@@ -28,7 +28,7 @@ def _process_response(response):
     try:
         response = response.json()
     except JSONDecodeError:
-        raise MalformedRespone(response.text)
+        raise MalformedResponse(response.text)
 
     status = response['status']
     if status == 'ok':
@@ -78,7 +78,7 @@ def retry_on_eintr(function, *args, **kw):
 
 __all__ = [
     ErrorResponse.__name__,
-    MalformedRespone.__name__,
+    MalformedResponse.__name__,
     get_request.__name__,
     indent.__name__,
     post_request.__name__,
