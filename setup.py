@@ -26,6 +26,7 @@ setup(
     install_requires=[
         'requests',
         'scrapy>=0.17',
+        'urllib3',
         'w3lib',
     ],
     extras_require={
