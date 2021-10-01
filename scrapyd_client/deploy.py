@@ -40,9 +40,9 @@ setup(
 
 def parse_args():
     parser = ArgumentParser(description="Deploy Scrapy project to Scrapyd server")
-    parser.add_argument('target', nargs='?', default='default')
+    parser.add_argument('target', nargs='?', metavar='TARGET', default='default')
     parser.add_argument("-p", "--project",
-                        help="the project name in the target")
+                        help="the project name in the TARGET")
     parser.add_argument("-v", "--version",
                         help="the version to deploy. Defaults to current timestamp")
     parser.add_argument("-l", "--list-targets", action="store_true",
@@ -51,8 +51,8 @@ def parse_args():
                         help="deploy all targets")
     parser.add_argument("-d", "--debug", action="store_true",
                         help="debug mode (do not remove build dir)")
-    parser.add_argument("-L", "--list-projects", metavar="TARGET",
-                        help="list available projects on TARGET")
+    parser.add_argument("-L", "--list-projects", action="store_true",
+                        help="list available projects in the TARGET")
     parser.add_argument("--egg", metavar="FILE",
                         help="use the given egg, instead of building it")
     parser.add_argument("--build-egg", metavar="FILE",
@@ -77,7 +77,7 @@ def main():
         return
 
     if opts.list_projects:
-        target = _get_target(opts.list_projects)
+        target = _get_target(opts.target)
         req = Request(_url(target, 'listprojects.json'))
         _add_auth_header(req, target)
         f = urlopen(req)

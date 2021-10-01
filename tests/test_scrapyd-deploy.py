@@ -103,9 +103,9 @@ def test_too_many_arguments(script_runner, project):
     assert not ret.success
     assert ret.stdout == ''
     assertLines(ret.stderr, dedent("""\
-        usage: scrapyd-deploy [-h] [-p PROJECT] [-v VERSION] [-l] [-a] [-d]
-                              [-L TARGET] [--egg FILE] [--build-egg FILE]
-                              [target]
+        usage: scrapyd-deploy [-h] [-p PROJECT] [-v VERSION] [-l] [-a] [-d] [-L]
+                              [--egg FILE] [--build-egg FILE]
+                              [TARGET]
         scrapyd-deploy: error: unrecognized arguments: extra
     """))
 

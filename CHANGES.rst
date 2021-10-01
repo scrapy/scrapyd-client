@@ -4,6 +4,7 @@ History
 Unreleased
 ~~~~~~~~~~
 
+- ``scrapyd-deploy``: ``--list-projects`` (``-L``) now uses the ``TARGET`` positional argument instead of accepting a ``TARGET`` option.
 - Address deprecation warnings.
 - Add dependency on ``urllib3``.
 
