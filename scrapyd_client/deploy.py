@@ -8,7 +8,7 @@ import shutil
 import time
 import netrc
 import json
-from optparse import OptionParser
+from argparse import ArgumentParser
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse, urljoin
 from urllib.request import (build_opener, install_opener,
@@ -38,29 +38,30 @@ setup(
 """.lstrip()
 
 
-def parse_opts():
-    parser = OptionParser(usage="%prog [options] [ [target] | -l | -L <target> ]",
-                          description="Deploy Scrapy project to Scrapyd server")
-    parser.add_option("-p", "--project",
-                      help="the project name in the target")
-    parser.add_option("-v", "--version",
-                      help="the version to deploy. Defaults to current timestamp")
-    parser.add_option("-l", "--list-targets", action="store_true",
-                      help="list available targets")
-    parser.add_option("-a", "--deploy-all-targets", action="store_true", help="deploy all targets")
-    parser.add_option("-d", "--debug", action="store_true",
-                      help="debug mode (do not remove build dir)")
-    parser.add_option("-L", "--list-projects", metavar="TARGET",
-                      help="list available projects on TARGET")
-    parser.add_option("--egg", metavar="FILE",
-                      help="use the given egg, instead of building it")
-    parser.add_option("--build-egg", metavar="FILE",
-                      help="only build the egg, don't deploy it")
+def parse_args():
+    parser = ArgumentParser(description="Deploy Scrapy project to Scrapyd server")
+    parser.add_argument('target', nargs='?', default='default')
+    parser.add_argument("-p", "--project",
+                        help="the project name in the target")
+    parser.add_argument("-v", "--version",
+                        help="the version to deploy. Defaults to current timestamp")
+    parser.add_argument("-l", "--list-targets", action="store_true",
+                        help="list available targets")
+    parser.add_argument("-a", "--deploy-all-targets", action="store_true",
+                        help="deploy all targets")
+    parser.add_argument("-d", "--debug", action="store_true",
+                        help="debug mode (do not remove build dir)")
+    parser.add_argument("-L", "--list-projects", metavar="TARGET",
+                        help="list available projects on TARGET")
+    parser.add_argument("--egg", metavar="FILE",
+                        help="use the given egg, instead of building it")
+    parser.add_argument("--build-egg", metavar="FILE",
+                        help="only build the egg, don't deploy it")
     return parser.parse_args()
 
 
 def main():
-    opts, args = parse_opts()
+    opts = parse_args()
     exitcode = 0
     if not inside_project():
         _log("Error: no Scrapy project found in this location")
@@ -97,8 +98,7 @@ def main():
                 version = _get_version(target, opts)
             _build_egg_and_deploy_target(target, version, opts)
     else:  # buld egg and deploy
-        target_name = _get_target_name(args)
-        target = _get_target(target_name)
+        target = _get_target(opts.target)
         version = _get_version(target, opts)
         exitcode, tmpdir = _build_egg_and_deploy_target(target, version, opts)
 
@@ -134,15 +134,6 @@ def _log(message):
 def _fail(message, code=1):
     _log(message)
     sys.exit(code)
-
-
-def _get_target_name(args):
-    if len(args) > 1:
-        raise _fail("Error: Too many arguments: %s" % ' '.join(args))
-    elif args:
-        return args[0]
-    elif len(args) < 1:
-        return 'default'
 
 
 def _get_project(target, opts):
