@@ -125,7 +125,7 @@ def assertLines(actual, expected):
             assert re.search(f'^{expected[i]}$', line), f'{line} does not match {expected[i]}'
 
 
-@pytest.mark.parametrize('args', [[], ['-l'], ['-L']])
+@pytest.mark.parametrize('args', [[], ['-l'], ['-L', 'default']])
 def test_not_in_project(args, script_runner):
     ret = script_runner.run('scrapyd-deploy', *args)
 
@@ -134,7 +134,7 @@ def test_not_in_project(args, script_runner):
     assertLines(ret.stderr, 'Error: no Scrapy project found in this location')
 
 
-@pytest.mark.parametrize('args', [[], ['-l'], ['-L']])
+@pytest.mark.parametrize('args', [[], ['-l'], ['-L', 'default']])
 def test_too_many_arguments(args, script_runner, project):
     ret = script_runner.run('scrapyd-deploy', 'mytarget', 'extra')
 
@@ -143,7 +143,7 @@ def test_too_many_arguments(args, script_runner, project):
     assertLines(ret.stderr, dedent("""\
         usage: scrapyd-deploy [-h] [-p PROJECT] [-v VERSION] [-l] [-a] [-d]
                               [-L TARGET] [--egg FILE] [--build-egg FILE]
-                              [target]
+                              [TARGET]
         scrapyd-deploy: error: unrecognized arguments: extra
     """))
 
