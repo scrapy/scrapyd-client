@@ -4,6 +4,7 @@ History
 Unreleased
 ~~~~~~~~~~
 
+- fix: Remove temporary directories created by ``scrapyd-deploy --deploy-all-targets``.
 - Address deprecation warnings.
 - Add dependency on ``urllib3``.
 
