@@ -96,19 +96,24 @@ def main():
         for name, target in _get_targets().items():
             if version is None:
                 version = _get_version(target, opts)
-            _build_egg_and_deploy_target(target, version, opts)
+            _, tmpdir = _build_egg_and_deploy_target(target, version, opts)
+            _remove_tmpdir(tmpdir, opts)
     else:  # buld egg and deploy
         target = _get_target(opts.target)
         version = _get_version(target, opts)
         exitcode, tmpdir = _build_egg_and_deploy_target(target, version, opts)
 
+    _remove_tmpdir(tmpdir, opts)
+
+    sys.exit(exitcode)
+
+
+def _remove_tmpdir(tmpdir, opts):
     if tmpdir:
         if opts.debug:
             _log("Output dir not removed: %s" % tmpdir)
         else:
             shutil.rmtree(tmpdir)
-
-    sys.exit(exitcode)
 
 
 def _build_egg_and_deploy_target(target, version, opts):
