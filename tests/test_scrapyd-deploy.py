@@ -51,6 +51,11 @@ def project(tmpdir, script_runner):
     yield
     os.chdir(cwd)
 
+@pytest.fixture
+def project_with_dependencies(project):
+    with open('requirements.txt', 'w') as f:
+        f.write("")
+
 
 @pytest.fixture
 def conf_empty_section_implicit_target(project):
@@ -143,6 +148,7 @@ def test_too_many_arguments(args, script_runner, project):
     assertLines(ret.stderr, dedent("""\
         usage: scrapyd-deploy [-h] [-p PROJECT] [-v VERSION] [-l] [-a] [-d]
                               [-L TARGET] [--egg FILE] [--build-egg FILE]
+                              [--include-deps]
                               [TARGET]
         scrapyd-deploy: error: unrecognized arguments: extra
     """))
@@ -234,6 +240,28 @@ def test_build_egg(script_runner, project):
     assert ret.success
     assert ret.stdout == ''
     assertLines(ret.stderr, 'Writing egg to myegg.egg')
+
+
+def test_build_egg_inc_dependencies_no_dep(script_runner, project):
+    ret = script_runner.run('scrapyd-deploy', '--include-deps', '--build-egg', 'myegg-deps.egg')
+
+    assert not ret.success
+    assert ret.stdout == ''
+    assertLines(ret.stderr, dedent("""\
+        Including dependencies in build from requirements.txt
+        requirements.txt file not found. Create one to include dependencies in the build.
+    """))
+
+
+def test_build_egg_inc_dependencies_with_dep(script_runner, project_with_dependencies):
+    ret = script_runner.run('scrapyd-deploy', '--include-deps', '--build-egg', 'myegg-deps.egg')
+
+    assert ret.success
+    assert ret.stdout == ''
+    assertLines(ret.stderr, dedent("""\
+        Including dependencies in build from requirements.txt
+        Writing egg to myegg-deps.egg
+    """))
 
 
 def test_deploy_success(script_runner, conf_default_target):

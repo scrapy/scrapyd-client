@@ -24,6 +24,7 @@ setup(
     packages=find_packages(exclude=('tests', 'tests.*')),
     include_package_data=True,
     install_requires=[
+        'uberegg>=0.1.1', 
         'requests',
         'scrapy>=0.17',
         'urllib3',

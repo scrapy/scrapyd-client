@@ -57,6 +57,8 @@ def parse_args():
                         help="use the given egg, instead of building it")
     parser.add_argument("--build-egg", metavar="FILE",
                         help="only build the egg, don't deploy it")
+    parser.add_argument("--include-deps", action="store_true",
+                        help="include dependencies in the egg (from requirements.txt)")
     return parser.parse_args()
 
 
@@ -88,7 +90,7 @@ def main():
     tmpdir = None
 
     if opts.build_egg:  # build egg only
-        egg, tmpdir = _build_egg()
+        egg, tmpdir = _build_egg(opts)
         _log("Writing egg to %s" % opts.build_egg)
         shutil.copyfile(egg, opts.build_egg)
     elif opts.deploy_all_targets:
@@ -126,7 +128,7 @@ def _build_egg_and_deploy_target(target, version, opts):
         egg = opts.egg
     else:
         _log("Packing version %s" % version)
-        egg, tmpdir = _build_egg()
+        egg, tmpdir = _build_egg(opts)
     if not _upload_egg(target, egg, project, version):
         exitcode = 1
     return exitcode, tmpdir
@@ -254,7 +256,7 @@ def _http_post(request):
         _log("Deploy failed: %s" % e)
 
 
-def _build_egg():
+def _build_egg(opts):
     closest = closest_scrapy_cfg()
     os.chdir(os.path.dirname(closest))
     if not os.path.exists('setup.py'):
@@ -263,10 +265,19 @@ def _build_egg():
     d = tempfile.mkdtemp(prefix="scrapydeploy-")
     o = open(os.path.join(d, "stdout"), "wb")
     e = open(os.path.join(d, "stderr"), "wb")
-    retry_on_eintr(check_call, [sys.executable, 'setup.py', 'clean', '-a', 'bdist_egg', '-d', d],
-                   stdout=o, stderr=e)
+
+    if opts.include_deps:
+        _log(f"Including dependencies in build from requirements.txt")
+        args = [sys.executable, 'setup.py', 'bdist_uberegg', '-d', d]
+        if not os.path.isfile('requirements.txt'):
+            _fail('requirements.txt file not found. Create one to include dependencies in the build.')
+    else:
+        args = [sys.executable, 'setup.py', 'clean', '-a', 'bdist_egg', '-d', d]
+
+    retry_on_eintr(check_call, args,stdout=o, stderr=e)
     o.close()
     e.close()
+    
     egg = glob.glob(os.path.join(d, '*.egg'))[0]
     return egg, d
 
