@@ -20,9 +20,9 @@ from urllib3.filepost import encode_multipart_formdata
 import setuptools  # noqa: F401 not used in code but needed in runtime, don't remove!
 
 from scrapy.utils.project import inside_project
-from scrapy.utils.conf import get_config, closest_scrapy_cfg
+from scrapy.utils.conf import closest_scrapy_cfg
 
-from scrapyd_client.utils import retry_on_eintr
+from scrapyd_client.utils import get_config, retry_on_eintr
 
 _SETUP_PY_TEMPLATE = """
 # Automatically created by: scrapyd-deploy

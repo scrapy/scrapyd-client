@@ -1,16 +1,26 @@
 import errno
+import os
+from configparser import BasicInterpolation, ConfigParser
 from json.decoder import JSONDecodeError
 from os.path import dirname, join
 from textwrap import indent
 
 import requests
-
+from scrapy.utils.conf import get_sources
 
 with open(join(dirname(__file__), 'VERSION'), 'rt') as f:
     VERSION = f.readline().strip()
 
 HEADERS = requests.utils.default_headers().copy()
 HEADERS['User-Agent'] = f'Scrapyd-client/{VERSION}'
+
+
+class EnvInterpolation(BasicInterpolation):
+    """Interpolation which expands environment variables in values."""
+
+    def before_get(self, parser, section, option, value, defaults):
+        value = super().before_get(parser, section, option, value, defaults)
+        return os.path.expandvars(value)
 
 
 class ErrorResponse(Exception):
@@ -74,6 +84,14 @@ def retry_on_eintr(function, *args, **kw):
         except IOError as e:
             if e.errno != errno.EINTR:
                 raise
+
+
+def get_config(use_closest=True):
+    """Get Scrapy config file as a ConfigParser"""
+    sources = get_sources(use_closest)
+    cfg = ConfigParser(interpolation=EnvInterpolation())
+    cfg.read(sources)
+    return cfg
 
 
 __all__ = [
