@@ -147,13 +147,17 @@ Some things to keep in mind when building eggs for your Scrapy project:
 .. _tempfile: https://docs.python.org/library/tempfile.html
 
 Including dependencies
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
-Sometimes your project will depend on third party libraries that are not available on scrapyd.  In this case,
-you may want to build your eggs with all your project dependencies. You will need to have a ``requirements.txt``
-file at the root of your project and use the ``--include-deps`` option when building or deploying your project.
+If your project has additional dependencies, you can either install them on the Scrapyd server, or
+you can include them in the project's egg, in two steps:
 
-    scrapyd-deploy --include-deps
+-  Create a `requirements.txt`_ file at the root of the project
+-  Use the ``--include-dependencies`` option when building or deploying your project::
+
+      scrapyd-deploy --include-dependencies
+
+.. _requirements.txt: https://pip.pypa.io/en/latest/reference/requirements-file-format/
 
 scrapyd-client
 --------------

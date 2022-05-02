@@ -54,7 +54,7 @@ def project(tmpdir, script_runner):
 @pytest.fixture
 def project_with_dependencies(project):
     with open('requirements.txt', 'w') as f:
-        f.write("")
+        f.write('')
 
 
 @pytest.fixture
@@ -148,7 +148,7 @@ def test_too_many_arguments(args, script_runner, project):
     assertLines(ret.stderr, dedent("""\
         usage: scrapyd-deploy [-h] [-p PROJECT] [-v VERSION] [-l] [-a] [-d]
                               [-L TARGET] [--egg FILE] [--build-egg FILE]
-                              [--include-deps]
+                              [--include-dependencies]
                               [TARGET]
         scrapyd-deploy: error: unrecognized arguments: extra
     """))
@@ -243,7 +243,7 @@ def test_build_egg(script_runner, project):
 
 
 def test_build_egg_inc_dependencies_no_dep(script_runner, project):
-    ret = script_runner.run('scrapyd-deploy', '--include-deps', '--build-egg', 'myegg-deps.egg')
+    ret = script_runner.run('scrapyd-deploy', '--include-dependencies', '--build-egg', 'myegg-deps.egg')
 
     assert not ret.success
     assert ret.stdout == ''
@@ -254,7 +254,7 @@ def test_build_egg_inc_dependencies_no_dep(script_runner, project):
 
 
 def test_build_egg_inc_dependencies_with_dep(script_runner, project_with_dependencies):
-    ret = script_runner.run('scrapyd-deploy', '--include-deps', '--build-egg', 'myegg-deps.egg')
+    ret = script_runner.run('scrapyd-deploy', '--include-dependencies', '--build-egg', 'myegg-deps.egg')
 
     assert ret.success
     assert ret.stdout == ''

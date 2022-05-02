@@ -57,8 +57,8 @@ def parse_args():
                         help="use the given egg, instead of building it")
     parser.add_argument("--build-egg", metavar="FILE",
                         help="only build the egg, don't deploy it")
-    parser.add_argument("--include-deps", action="store_true",
-                        help="include dependencies in the egg (from requirements.txt)")
+    parser.add_argument("--include-dependencies", action="store_true",
+                        help="include dependencies from requirements.txt in the egg")
     return parser.parse_args()
 
 
@@ -266,18 +266,18 @@ def _build_egg(opts):
     o = open(os.path.join(d, "stdout"), "wb")
     e = open(os.path.join(d, "stderr"), "wb")
 
-    if opts.include_deps:
-        _log(f"Including dependencies in build from requirements.txt")
-        args = [sys.executable, 'setup.py', 'bdist_uberegg', '-d', d]
+    if opts.include_dependencies:
+        _log('Including dependencies from requirements.txt')
         if not os.path.isfile('requirements.txt'):
-            _fail('requirements.txt file not found. Create one to include dependencies in the build.')
+            _fail('Error: Missing requirements.txt')
+        command = 'bdist_uberegg'
     else:
-        args = [sys.executable, 'setup.py', 'clean', '-a', 'bdist_egg', '-d', d]
+        command = 'bdist_egg'
 
-    retry_on_eintr(check_call, args,stdout=o, stderr=e)
+    retry_on_eintr(check_call, [sys.executable, 'setup.py', 'clean', '-a', command, '-d', d], stdout=o, stderr=e)
     o.close()
     e.close()
-    
+
     egg = glob.glob(os.path.join(d, '*.egg'))[0]
     return egg, d
 

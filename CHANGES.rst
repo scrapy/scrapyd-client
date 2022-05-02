@@ -4,7 +4,7 @@ History
 Unreleased
 ~~~~~~~~~~
 
-- feat: Add ``scrapyd-deploy --include-deps`` option to install project dependencies from a ``requirements.txt`` file.
+- feat: Add ``scrapyd-deploy --include-dependencies`` option to install project dependencies from a ``requirements.txt`` file.
 - fix: Remove temporary directories created by ``scrapyd-deploy --deploy-all-targets``.
 - chore: Address deprecation warnings.
 - chore: Add dependency on ``urllib3``.
