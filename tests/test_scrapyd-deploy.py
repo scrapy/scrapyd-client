@@ -248,8 +248,8 @@ def test_build_egg_inc_dependencies_no_dep(script_runner, project):
     assert not ret.success
     assert ret.stdout == ''
     assertLines(ret.stderr, dedent("""\
-        Including dependencies in build from requirements.txt
-        requirements.txt file not found. Create one to include dependencies in the build.
+        Including dependencies from requirements.txt
+        Error: Missing requirements.txt
     """))
 
 
@@ -259,7 +259,7 @@ def test_build_egg_inc_dependencies_with_dep(script_runner, project_with_depende
     assert ret.success
     assert ret.stdout == ''
     assertLines(ret.stderr, dedent("""\
-        Including dependencies in build from requirements.txt
+        Including dependencies from requirements.txt
         Writing egg to myegg-deps.egg
     """))
 
