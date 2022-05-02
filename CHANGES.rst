@@ -1,8 +1,8 @@
 History
 -------
 
-Unreleased
-~~~~~~~~~~
+1.2.1 (2022-05-02)
+~~~~~~~~~~~~~~~~~~
 
 - feat: Add ``scrapyd-deploy --include-dependencies`` option to install project dependencies from a ``requirements.txt`` file.
 - fix: Remove temporary directories created by ``scrapyd-deploy --deploy-all-targets``.
