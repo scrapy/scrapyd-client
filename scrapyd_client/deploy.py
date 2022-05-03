@@ -104,8 +104,7 @@ def main():
         target = _get_target(opts.target)
         version = _get_version(target, opts)
         exitcode, tmpdir = _build_egg_and_deploy_target(target, version, opts)
-
-    _remove_tmpdir(tmpdir, opts)
+        _remove_tmpdir(tmpdir, opts)
 
     sys.exit(exitcode)
 
