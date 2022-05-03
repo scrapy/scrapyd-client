@@ -1,6 +1,11 @@
 History
 -------
 
+1.2.2 (2022-05-03)
+~~~~~~~~~~~~~~~~~~
+
+- fix: Fix ``FileNotFoundError`` when using ``scrapyd-deploy --deploy-all-targets``.
+
 1.2.1 (2022-05-02)
 ~~~~~~~~~~~~~~~~~~
 
