@@ -126,17 +126,19 @@ Some things to keep in mind when building eggs for your Scrapy project:
 -  Make sure no local development settings are included in the egg when you build it. The
    ``find_packages`` function may be picking up your custom settings. In most cases you want to
    upload the egg with the default project settings.
--  You should avoid using ``__file__`` in your project code as it doesn't play well with eggs.
+-  Avoid using ``__file__`` in your project code as it doesn't play well with eggs.
    Consider using `pkgutil.get_data`_ instead. Instead of:
 
    .. code-block:: python
 
-      open(os.path.join(os.path.abspath(os.path.dirname(__file__)), "tools/json/test.json"))  # BAD
+      path = os.path.dirname(os.path.realpath(__file__))  # BAD
+      open(os.path.join(path, "tools", "json", "test.json"), "rb").read()
 
    Use:
 
    .. code-block:: python
 
+      import pkgutil
       pkgutil.get_data("projectname", "tools/json/test.json")
 
 -  Be careful when writing to disk in your project, as Scrapyd will most likely be running under a
