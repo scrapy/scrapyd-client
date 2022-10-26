@@ -1,6 +1,12 @@
 History
 -------
 
+
+1.2.3 (2022-10-25)
+~~~~~~~~~~~~~~~~~~
+
+- feat: Add Option to ignore certificate verification
+
 1.2.2 (2022-05-03)
 ~~~~~~~~~~~~~~~~~~
 
