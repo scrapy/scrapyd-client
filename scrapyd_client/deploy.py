@@ -227,7 +227,7 @@ def _upload_egg(target, eggpath, project, version):
     res = requests.post(
         url, data=body, headers=headers, verify=not skip_tls_verify
     )
-    if res.ok():
+    if res.ok:
         _log("Server response (%s):" % res.status_code)
     else:
         _log("Deploy failed (%s):" % res.status_code)
