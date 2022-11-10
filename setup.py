@@ -38,7 +38,7 @@ setup(
             'pytest-mock',
         ]
     },
-    python_requires='>=3.7',
+    python_requires='>=3.6',
     license='BSD',
     zip_safe=False,
     entry_points={
