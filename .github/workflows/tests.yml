@@ -9,11 +9,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: [3.6, 3.7, 3.8, 3.9, pypy-3.7]
+        python-version: [3.7, 3.8, 3.9, "3.10", "3.11", pypy-3.7]
         include:
-        - python-version: 3.6
-          env:
-            TOXENV: py
         - python-version: 3.7
           env:
             TOXENV: py
@@ -21,6 +18,12 @@ jobs:
           env:
             TOXENV: py
         - python-version: 3.9
+          env:
+            TOXENV: py
+        - python-version: "3.10"
+          env:
+            TOXENV: py
+        - python-version: "3.11"
           env:
             TOXENV: py
         - python-version: pypy-3.7
@@ -31,9 +34,11 @@ jobs:
         exclude:
           - os: windows-latest
             python-version: pypy-3.7
+          - os: windows-latest
+            python-version: "3.11"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install system libraries
       if: contains(matrix.os, 'ubuntu') && contains(matrix.python-version, 'pypy')
@@ -42,7 +47,7 @@ jobs:
         sudo apt-get install libxml2-dev libxslt-dev
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
