@@ -225,6 +225,20 @@ You can define a Scrapyd target in your project's ``scrapy.cfg`` file. Example:
    password = secret
    project = projectname
 
+Optionally if you deploy through another host (e.g. when you use a ssh tunnel)
+you can set skip-tls-verify and the original host like this:
+
+.. code-block:: ini
+   [deploy]
+   url = http://127.0.0.1/api/scrapyd
+   username = scrapy
+   password = secret
+   project = projectname
+   skip-tls-verify = true
+   host = scrapyd.example.com
+   
+
+
 You can now deploy your project without the ``<target>`` argument or ``-p <project>`` option::
 
    scrapyd-deploy

@@ -7,6 +7,7 @@ import tempfile
 import shutil
 import time
 import netrc
+import requests
 import json
 from argparse import ArgumentParser
 from urllib.error import HTTPError, URLError
@@ -213,46 +214,38 @@ def _upload_egg(target, eggpath, project, version):
         'Content-Type': content_type,
         'Content-Length': str(len(body)),
     }
-    req = Request(url, body, headers)
-    _add_auth_header(req, target)
+    skip_tls_verify = target.get("skip-tls-verify", False)
+    if skip_tls_verify:
+        host_header = target.get("host")
+        if not host_header:
+            _fail("""Missing host header with skip-tls-verify active! 
+                    Please set the host in your scrapy.cfg when setting 
+                    skip-tls-verify to true!.""")
+        headers["Host"] = host_header
+    _add_auth_header(headers, target)
     _log('Deploying to project "%s" in %s' % (project, url))
-    return _http_post(req)
+    res = requests.post(
+        url, data=body, headers=headers, verify=not skip_tls_verify
+    )
+    if res.ok:
+        _log("Server response (%s):" % res.status_code)
+    else:
+        _log("Deploy failed (%s):" % res.status_code)
+    _log(json.dumps(res.json(), indent=3))
+    return True
 
 
-def _add_auth_header(request, target):
+def _add_auth_header(headers: dict, target):
     if 'username' in target:
         u, p = target.get('username'), target.get('password', '')
-        request.add_header('Authorization', basic_auth_header(u, p))
+        headers['Authorization'] = basic_auth_header(u, p)
     else:  # try netrc
         try:
             host = urlparse(target['url']).hostname
             a = netrc.netrc().authenticators(host)
-            request.add_header('Authorization', basic_auth_header(a[0], a[2]))
+            headers['Authorization'] = basic_auth_header(a[0], a[2])
         except (netrc.NetrcParseError, IOError, TypeError):
             pass
-
-
-def _http_post(request):
-    try:
-        f = urlopen(request)
-        _log("Server response (%s):" % f.code)
-        print(f.read().decode())
-        return True
-    except HTTPError as e:
-        _log("Deploy failed (%s):" % e.code)
-        resp = e.read().decode()
-        try:
-            d = json.loads(resp)
-        except ValueError:
-            print(resp)
-        else:
-            if "status" in d and "message" in d:
-                print("Status: %(status)s" % d)
-                print("Message:\n%(message)s" % d)
-            else:
-                print(json.dumps(d, indent=3))
-    except URLError as e:
-        _log("Deploy failed: %s" % e)
 
 
 def _build_egg(opts):
