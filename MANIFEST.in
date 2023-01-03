@@ -5,3 +5,4 @@ include scrapyd_client/VERSION
 include tox.ini
 recursive-include tests *.py
 exclude .bumpversion.cfg
+exclude .pre-commit-config.yaml

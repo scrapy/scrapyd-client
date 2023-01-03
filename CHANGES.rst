@@ -1,6 +1,11 @@
 History
 -------
 
+Unreleased
+~~~~~~~~~~
+
+- feat: Add ``scrapyd-client --username`` and ``--password`` options.
+
 1.2.2 (2022-05-03)
 ~~~~~~~~~~~~~~~~~~
 
@@ -14,7 +19,6 @@ History
 - chore: Address deprecation warnings.
 - chore: Add dependency on ``urllib3``.
 
-
 1.2.0 (2021-10-01)
 ~~~~~~~~~~~~~~~~~~
 
@@ -23,14 +27,12 @@ History
 - Drop support for Python 2.7, 3.4, 3.5.
 - Remove ``scrapyd_client.utils.get_config``, which was a compatibility wrapper for Python 2.7.
 
-
 1.2.0a1 (2017-08-24)
 ~~~~~~~~~~~~~~~~~~~~
 
 - Install ``scrapyd-deploy`` as a console script.
 - New ``scrapyd-client`` CLI with ``deploy``, ``projects``, ``spiders``,
   and ``schedule`` subcommands.
-
 
 1.1.0 (2017-02-10)
 ~~~~~~~~~~~~~~~~~~
@@ -39,7 +41,6 @@ History
 - Fix returncode on egg deploy error.
 - Add Python 3 support.
 - Drop Python 2.6 support.
-
 
 1.0.1 (2015-04-09)
 ~~~~~~~~~~~~~~~~~~
