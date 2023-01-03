@@ -5,6 +5,7 @@ Unreleased
 ~~~~~~~~~~
 
 - feat: Add ``scrapyd-client --username`` and ``--password`` options.
+- feat: Expand environment variables in the ``scrapy.cfg`` file.
 
 1.2.2 (2022-05-03)
 ~~~~~~~~~~~~~~~~~~
