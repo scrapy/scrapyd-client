@@ -239,6 +239,24 @@ If you have multiple targets, add the target name in the section name. Example:
    [deploy:another]
    url = http://other.example.com/api/scrapyd
 
+If you are working with CD frameworks, you do not need to commit your secrets to your repository. You can use environment variable expansion like so:
+
+.. code-block:: ini
+
+   [deploy]
+   url = $SCRAPYD_URL
+   username = $SCRAPYD_USERNAME
+   password = $SCRAPYD_PASSWORD
+
+or using this syntax:
+
+.. code-block:: ini
+
+   [deploy]
+   url = ${SCRAPYD_URL}
+   username = ${SCRAPYD_USERNAME}
+   password = ${SCRAPYD_PASSWORD}
+
 To deploy to one target, run::
 
    scrapyd-deploy targetname -p <project>

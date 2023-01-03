@@ -15,12 +15,12 @@ from urllib.request import HTTPRedirectHandler as UrllibHTTPRedirectHandler
 from urllib.request import Request, build_opener, install_opener, urlopen
 
 import setuptools  # noqa: F401 not used in code but needed in runtime, don't remove!
-from scrapy.utils.conf import closest_scrapy_cfg, get_config
+from scrapy.utils.conf import closest_scrapy_cfg
 from scrapy.utils.project import inside_project
 from urllib3.filepost import encode_multipart_formdata
 from w3lib.http import basic_auth_header
 
-from scrapyd_client.utils import get_auth, retry_on_eintr
+from scrapyd_client.utils import get_auth, get_config, retry_on_eintr
 
 _SETUP_PY_TEMPLATE = """
 # Automatically created by: scrapyd-deploy
