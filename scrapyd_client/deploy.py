@@ -6,11 +6,10 @@ import glob
 import tempfile
 import shutil
 import time
-import netrc
 import json
 from argparse import ArgumentParser
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urljoin
 from urllib.request import (build_opener, install_opener,
                             HTTPRedirectHandler as UrllibHTTPRedirectHandler, Request, urlopen)
 from subprocess import Popen, PIPE, check_call
@@ -22,7 +21,7 @@ import setuptools  # noqa: F401 not used in code but needed in runtime, don't re
 from scrapy.utils.project import inside_project
 from scrapy.utils.conf import get_config, closest_scrapy_cfg
 
-from scrapyd_client.utils import retry_on_eintr
+from scrapyd_client.utils import retry_on_eintr, get_auth
 
 _SETUP_PY_TEMPLATE = """
 # Automatically created by: scrapyd-deploy
@@ -220,16 +219,10 @@ def _upload_egg(target, eggpath, project, version):
 
 
 def _add_auth_header(request, target):
-    if 'username' in target:
-        u, p = target.get('username'), target.get('password', '')
-        request.add_header('Authorization', basic_auth_header(u, p))
-    else:  # try netrc
-        try:
-            host = urlparse(target['url']).hostname
-            a = netrc.netrc().authenticators(host)
-            request.add_header('Authorization', basic_auth_header(a[0], a[2]))
-        except (netrc.NetrcParseError, IOError, TypeError):
-            pass
+    url, username, password = target['url'], target.get('username'), target.get('password', '')
+    auth = get_auth(url=url, username=username, password=password)
+    if auth:
+        request.add_header('Authorization', basic_auth_header(auth.username, auth.password))
 
 
 def _http_post(request):
