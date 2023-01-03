@@ -1,64 +1,66 @@
 import errno
+import netrc
 from json.decoder import JSONDecodeError
 from os.path import dirname, join
 from textwrap import indent
 from urllib.parse import urlparse
-from scrapy.utils.conf import get_config
-import netrc
 
 import requests
 from requests.auth import HTTPBasicAuth
 
-
-with open(join(dirname(__file__), 'VERSION'), 'rt') as f:
+with open(join(dirname(__file__), "VERSION"), "rt") as f:
     VERSION = f.readline().strip()
 
 HEADERS = requests.utils.default_headers().copy()
-HEADERS['User-Agent'] = f'Scrapyd-client/{VERSION}'
+HEADERS["User-Agent"] = f"Scrapyd-client/{VERSION}"
 
 
 class ErrorResponse(Exception):
-    """ Raised when Scrapyd reports an error. """
+    """Raised when Scrapyd reports an error."""
+
     pass
 
 
 class MalformedResponse(Exception):
-    """ Raised when the response can't be decoded. """
+    """Raised when the response can't be decoded."""
+
     pass
 
 
 def _process_response(response):
-    """ Processes the response object into a dictionary. """
+    """Process the response object into a dictionary."""
     try:
         response = response.json()
     except JSONDecodeError:
         raise MalformedResponse(response.text)
 
-    status = response['status']
-    if status == 'ok':
+    status = response["status"]
+    if status == "ok":
         pass
-    elif status == 'error':
-        raise ErrorResponse(response['message'])
+    elif status == "error":
+        raise ErrorResponse(response["message"])
     else:
-        raise RuntimeError(f'Unhandled response status: {status}')
+        raise RuntimeError(f"Unhandled response status: {status}")
 
     return response
 
 
 def get_auth(url, username, password):
-    """ Retrieves authentication from arguments or infers from .netrc.
-        :param url: The URL to check.
-        :type url: str
-        :param username: The username to use.
-        :type username: str
-        :param password: The password to use.
-        :type password: str
-        :returns: An HTTPBasicAuth object or None.
-        :rtype: requests.auth.HTTPBasicAuth or None
-    """  
-    auth=None
+    """
+    Retrieve authentication from arguments or infers from .netrc.
+
+    :param url: The URL to check.
+    :type url: str
+    :param username: The username to use.
+    :type username: str
+    :param password: The password to use.
+    :type password: str
+    :returns: An HTTPBasicAuth object or None.
+    :rtype: requests.auth.HTTPBasicAuth or None
+    """
+    auth = None
     if username:
-        auth=HTTPBasicAuth(username=username, password=password)
+        auth = HTTPBasicAuth(username=username, password=password)
     else:  # try netrc
         try:
             host = urlparse(url).hostname
@@ -67,35 +69,39 @@ def get_auth(url, username, password):
         except (netrc.NetrcParseError, IOError, TypeError):
             pass
     return auth
-  
+
 
 def get_request(url, params={}, auth=None):
-    """ Dispatches a request with GET method.
-        :param url: The URL to request.
-        :type url: str
-        :param params: The GET parameters.
-        :type params: mapping
-        :returns: The processed response.
-        :rtype: mapping
-    """  
+    """
+    Dispatches a request with GET method.
+
+    :param url: The URL to request.
+    :type url: str
+    :param params: The GET parameters.
+    :type params: mapping
+    :returns: The processed response.
+    :rtype: mapping
+    """
     response = requests.get(url, params=params, headers=HEADERS, auth=auth)
     return _process_response(response)
 
 
 def post_request(url, data, auth=None):
-    """ Dispatches a request with POST method.
-        :param url: The URL to request.
-        :type url: str
-        :param data: The data to post.
-        :returns: The processed response.
-        :rtype: mapping
+    """
+    Dispatches a request with POST method.
+
+    :param url: The URL to request.
+    :type url: str
+    :param data: The data to post.
+    :returns: The processed response.
+    :rtype: mapping
     """
     response = requests.post(url, data=data, headers=HEADERS, auth=auth)
     return _process_response(response)
 
 
 def retry_on_eintr(function, *args, **kw):
-    """Run a function and retry it while getting EINTR errors"""
+    """Run a function and retry it while getting EINTR errors."""
     while True:
         try:
             return function(*args, **kw)
@@ -110,5 +116,5 @@ __all__ = [
     get_request.__name__,
     indent.__name__,
     post_request.__name__,
-    retry_on_eintr.__name__
+    retry_on_eintr.__name__,
 ]
