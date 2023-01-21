@@ -16,6 +16,7 @@ with open(join(dirname(__file__), "VERSION"), "rt") as f:
 
 HEADERS = requests.utils.default_headers().copy()
 HEADERS["User-Agent"] = f"Scrapyd-client/{VERSION}"
+DEFAULT_TARGET_URL = "http://localhost:6800"
 
 
 class EnvInterpolation(BasicInterpolation):
@@ -122,7 +123,7 @@ def retry_on_eintr(function, *args, **kw):
 
 
 def get_config(use_closest=True):
-    """Get Scrapy config file as a ConfigParser"""
+    """Get Scrapy config file as a ConfigParser."""
     sources = get_sources(use_closest)
     cfg = ConfigParser(interpolation=EnvInterpolation())
     cfg.read(sources)
