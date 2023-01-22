@@ -5,7 +5,7 @@ from scrapyd_client.utils import DEFAULT_TARGET_URL
 
 
 class ScrapydClient:
-    """ScrapydClient to interact with a scrapyd instance."""
+    """ScrapydClient to interact with a Scrapyd instance."""
 
     def __init__(
         self, url: str = DEFAULT_TARGET_URL, username: str = None, password: str = None
@@ -23,7 +23,7 @@ class ScrapydClient:
             password=self.password,
         )
 
-    def spiders(self, project: str, pattern: str = "*"):
+    def spiders(self, project: str, pattern: str = "*") -> List[str]:
         return lib.get_spiders(
             url=self.url,
             project=project,
@@ -32,7 +32,7 @@ class ScrapydClient:
             password=self.password,
         )
 
-    def jobs(self, project: str):
+    def jobs(self, project: str) -> Dict:
         return lib.get_jobs(
             url=self.url,
             project=project,
