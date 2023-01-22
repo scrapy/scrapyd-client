@@ -182,7 +182,9 @@ def _get_target(name):
 
 
 def _url(target, action):
-    return urljoin(target["url"], action)
+    if "url" in target:
+        return urljoin(target["url"], action)
+    raise _fail("Error: Missing url for project")
 
 
 def _get_version(target, opts):
