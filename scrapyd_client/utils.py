@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 
 import requests
 from requests.auth import HTTPBasicAuth
-from scrapy.utils.conf import get_sources
+from scrapy.utils import conf
 
 with open(join(dirname(__file__), "VERSION"), "rt") as f:
     VERSION = f.readline().strip()
@@ -124,7 +124,7 @@ def retry_on_eintr(function, *args, **kw):
 
 def get_config(use_closest=True):
     """Get Scrapy config file as a ConfigParser."""
-    sources = get_sources(use_closest)
+    sources = conf.get_sources(use_closest)
     cfg = ConfigParser(interpolation=EnvInterpolation())
     cfg.read(sources)
     return cfg
