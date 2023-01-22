@@ -6,6 +6,7 @@ Unreleased
 
 - feat: Add ``scrapyd-client --username`` and ``--password`` options.
 - feat: Expand environment variables in the ``scrapy.cfg`` file.
+- feat: Add ``ScrapydClient``: a python client to interact with Scrapyd.
 
 1.2.2 (2022-05-03)
 ~~~~~~~~~~~~~~~~~~

@@ -5,9 +5,13 @@ from traceback import print_exc
 from requests.exceptions import ConnectionError
 
 from scrapyd_client import commands
-from scrapyd_client.utils import ErrorResponse, MalformedResponse, get_config
+from scrapyd_client.utils import (
+    DEFAULT_TARGET_URL,
+    ErrorResponse,
+    MalformedResponse,
+    get_config,
+)
 
-DEFAULT_TARGET_URL = "http://localhost:6800"
 ISSUE_TRACKER_URL = "https://github.com/scrapy/scrapyd-client/issues"
 
 
