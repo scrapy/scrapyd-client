@@ -4,9 +4,10 @@ History
 Unreleased
 ~~~~~~~~~~
 
-- feat: Add ``scrapyd-client --username`` and ``--password`` options.
-- feat: Expand environment variables in the ``scrapy.cfg`` file.
-- feat: Add ``ScrapydClient``: a python client to interact with Scrapyd.
+- feat: Add ``scrapyd-client --username`` and ``--password`` options. (@mxdev88)
+- feat: Expand environment variables in the ``scrapy.cfg`` file. (@mxdev88)
+- feat: Add ``ScrapydClient``: a python client to interact with Scrapyd. (@mxdev88)
+- Add support for Python 3.10, 3.11. (@Laerte)
 
 1.2.2 (2022-05-03)
 ~~~~~~~~~~~~~~~~~~
@@ -16,7 +17,7 @@ Unreleased
 1.2.1 (2022-05-02)
 ~~~~~~~~~~~~~~~~~~
 
-- feat: Add ``scrapyd-deploy --include-dependencies`` option to install project dependencies from a ``requirements.txt`` file.
+- feat: Add ``scrapyd-deploy --include-dependencies`` option to install project dependencies from a ``requirements.txt`` file. (@mxdev88)
 - fix: Remove temporary directories created by ``scrapyd-deploy --deploy-all-targets``.
 - chore: Address deprecation warnings.
 - chore: Add dependency on ``urllib3``.
