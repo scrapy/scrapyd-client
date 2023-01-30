@@ -1,8 +1,8 @@
 History
 -------
 
-Unreleased
-~~~~~~~~~~
+1.2.3 (2023-01-30)
+~~~~~~~~~~~~~~~~~~
 
 - feat: Add ``scrapyd-client --username`` and ``--password`` options. (@mxdev88)
 - feat: Expand environment variables in the ``scrapy.cfg`` file. (@mxdev88)
