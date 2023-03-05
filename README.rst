@@ -6,8 +6,14 @@ Scrapyd-client
 
 Scrapyd-client is a client for Scrapyd_. It provides:
 
+Command line tools:
+
 -  ``scrapyd-deploy``, to deploy your project to a Scrapyd server
 -  ``scrapyd-client``, to interact with your project once deployed
+
+Python client:
+
+-  ``ScrapydClient``, to interact with Scrapyd within your python code
 
 .. _Scrapyd: https://scrapyd.readthedocs.io
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/scrapyd-client.svg
@@ -209,6 +215,19 @@ Lists spiders of one or more projects::
    scrapyd-client spiders
    # lists all spiders from the 'knowledge' project
    scrapyd-client spiders -p knowledge
+
+ScrapydClient
+-------------
+
+Interact with Scrapyd within your python code.
+
+.. code-block:: python
+
+   from scrapyd_client import ScrapydClient
+   client = ScrapydClient()
+
+   for project in client.projects():
+      print(client.jobs(project=project))
 
 
 Scrapy configuration file
