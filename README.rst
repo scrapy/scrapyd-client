@@ -197,6 +197,8 @@ Schedules one or more spiders to be executed::
    scrapyd-client schedule -p knowledge \*
    # schedules any spider from any project whose name ends with '_daily'
    scrapyd-client schedule -p \* \*_daily
+   # schedules spider1 in project1 specifying settings
+   scrapyd-client schedule -p project1 spider1 --arg 'setting=DOWNLOADER_MIDDLEWARES={"my.middleware.MyDownloader": 610}'
 
 spiders
 ~~~~~~~
