@@ -25,7 +25,7 @@ def projects(args):
 
 def schedule(args):
     """Schedule the specified spider(s)."""
-    job_args = dict((x[0], x[1]) for x in (y.split("=", 1) for y in args.arg))
+    job_args = [(x[0], x[1]) for x in (y.split("=", 1) for y in args.arg)]
     _projects = lib.get_projects(
         args.target, args.project, username=args.username, password=args.password
     )

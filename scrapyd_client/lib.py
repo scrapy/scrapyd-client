@@ -72,7 +72,7 @@ def get_jobs(url, project, username=None, password=None):
     return response
 
 
-def schedule(url, project, spider, args={}, username=None, password=None):
+def schedule(url, project, spider, args=[], username=None, password=None):
     """
     Schedule a spider to be executed.
 
@@ -81,18 +81,18 @@ def schedule(url, project, spider, args={}, username=None, password=None):
     :param project: The name of the project.
     :type project: str
     :param spider: The name of the spider.
-    :type project: str
+    :type spider: str
     :param args: Extra arguments to the spider.
-    :type pattern: mapping
+    :type args: list of tuple
     :param username: The username to connect to Scrapyd.
-    :type pattern: str
+    :type username: str
     :param password: The password to connect to Scrapyd.
-    :type pattern: str
+    :type password: str
     :returns: The job id.
     :rtype: str
     """
     data = args.copy()
-    data.update({"project": project, "spider": spider})
+    data += [("project", project), ("spider", spider)]
     response = post_request(
         url + "/schedule.json",
         data=data,
