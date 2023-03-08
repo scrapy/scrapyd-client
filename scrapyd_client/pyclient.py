@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import scrapyd_client.lib as lib
 from scrapyd_client.utils import DEFAULT_TARGET_URL
@@ -40,7 +40,9 @@ class ScrapydClient:
             password=self.password,
         )
 
-    def schedule(self, project: str, spider: str, args: Dict = {}) -> str:
+    def schedule(
+        self, project: str, spider: str, args: List[Tuple[str, str]] = []
+    ) -> str:
         return lib.schedule(
             url=self.url,
             project=project,
