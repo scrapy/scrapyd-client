@@ -1,6 +1,11 @@
 History
 -------
 
+Unreleased
+~~~~~~~~~~
+
+- fix: The ``scrapyd-client schedule`` subcommand accepts multiple ``--arg setting=...`` arguments. (@mxdev88)
+
 1.2.3 (2023-01-30)
 ~~~~~~~~~~~~~~~~~~
 
