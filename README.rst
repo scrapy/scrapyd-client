@@ -298,7 +298,7 @@ While your target needs to be defined with its URL in ``scrapy.cfg``,
 you can use netrc_ for username and password, like so::
 
    machine scrapyd.example.com
-       username scrapy
+       login scrapy
        password secret
 
 .. _netrc: https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html
