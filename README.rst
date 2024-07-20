@@ -92,8 +92,7 @@ shown above. However, you can pass a custom version using ``--version``::
 
    scrapyd-deploy <target> -p <project> --version <version>
 
-The version must be comparable with LooseVersion_. Scrapyd will use the greatest version unless
-specified.
+The version must be comparable with `Version <https://github.com/scrapy/scrapyd/issues/426>`__. Scrapyd will use the greatest version unless specified.
 
 If you use Mercurial or Git, you can use ``HG`` or ``GIT`` respectively as the argument supplied to
 ``--version`` to use the current revision as the version. You can save yourself having to specify
@@ -104,8 +103,6 @@ the version parameter by adding it to your target's entry in ``scrapy.cfg``:
    [deploy]
    ...
    version = HG
-
-.. _LooseVersion: http://epydoc.sourceforge.net/stdlib/distutils.version.LooseVersion-class.html
 
 Local Settings
 ~~~~~~~~~~~~~~
