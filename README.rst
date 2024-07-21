@@ -8,12 +8,14 @@ Scrapyd-client is a client for Scrapyd_. It provides:
 
 Command line tools:
 
--  ``scrapyd-deploy``, to deploy your project to a Scrapyd server
--  ``scrapyd-client``, to interact with your project once deployed
+-  `scrapyd-deploy`_, to deploy your project to a Scrapyd server
+-  `scrapyd-client`_, to interact with your project once deployed
 
 Python client:
 
 -  ``ScrapydClient``, to interact with Scrapyd within your python code
+
+It is configured using the `Scrapy configuration file`_.
 
 .. _Scrapyd: https://scrapyd.readthedocs.io
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/scrapyd-client.svg
@@ -28,71 +30,55 @@ Python client:
 scrapyd-deploy
 --------------
 
-Deploying your project to a Scrapyd server typically involves two steps:
+Deploying your project to a Scrapyd server involves:
 
-1. Eggifying_ your project. You'll need to install setuptools_ for this. See `Egg Caveats`_ below.
-2. Uploading the egg to the Scrapyd server through the `addversion.json`_ endpoint.
+#. `Eggifying <https://setuptools.pypa.io/en/latest/deprecated/python_eggs.html>`__ your project.
+#. Uploading the egg to the Scrapyd server through the `addversion.json <https://scrapyd.readthedocs.org/en/latest/api.html#addversion-json>`__ webservice.
 
-The ``scrapyd-deploy`` tool automates the process of building the egg and pushing it to the target
-Scrapyd server.
+The ``scrapyd-deploy`` tool automates the process of building the egg and pushing it to the target Scrapyd server.
 
-.. _addversion.json: https://scrapyd.readthedocs.org/en/latest/api.html#addversion-json
-.. _Eggifying: http://peak.telecommunity.com/DevCenter/PythonEggs
-.. _setuptools: https://pypi.python.org/pypi/setuptools
-
-Including Static Files
-~~~~~~~~~~~~~~~~~~~~~~
-
-If the egg needs to include static (non-Python) files, edit the ``setup.py`` file in your project.
-Otherwise, you can skip this step.
-
-If you don't have a ``setup.py`` file, create one with::
-
-   scrapyd-deploy --build-egg=/dev/null
-
-Then, set the ``package_data`` keyword argument in the ``setup()`` function call in the
-``setup.py`` file. Example (note: ``projectname`` would be your project's name):
-
-.. code-block:: python
-
-   from setuptools import setup, find_packages
-
-   setup(
-       name         = 'project',
-       version      = '1.0',
-       packages     = find_packages(),
-       entry_points = {'scrapy': ['settings = projectname.settings']},
-       package_data = {'projectname': ['path/to/*.json']}
-   )
-
-Deploying a Project
+Deploying a project
 ~~~~~~~~~~~~~~~~~~~
 
-First ``cd`` into your project's root, you can then deploy your project with the following::
+#. Change (``cd``) to the root of your project (the directory containing the ``scrapy.cfg`` file)
+#. Eggify your project and upload it to the target:
 
-   scrapyd-deploy <target> -p <project>
+   .. code-block:: shell
 
-This will eggify your project and upload it to the target. If you have a ``setup.py`` file in your
-project, it will be used, otherwise one will be created automatically.
+      scrapyd-deploy <target> -p <project>
 
-If successful you should see a JSON response similar to the following::
+If you don't have a ``setup.py`` file in the root of your project, one will be created. If you have one, it must set the ``entry_points`` keyword argument in the ``setup()`` function call, for example:
+
+   .. code-block:: python
+      :emphasize-lines: 5
+
+      setup(
+          name         = 'project',
+          version      = '1.0',
+          packages     = find_packages(),
+          entry_points = {'scrapy': ['settings = projectname.settings']},
+      )
+
+If the command is successful, you should see a JSON response, like:
+
+.. code-block:: none
 
    Deploying myproject-1287453519 to http://localhost:6800/addversion.json
    Server response (200):
    {"status": "ok", "spiders": ["spider1", "spider2"]}
 
-To save yourself from having to specify the target and project, you can set the defaults in the
-`Scrapy configuration file`_.
+To save yourself from having to specify the target and project, you can configure your defaults in the `Scrapy configuration file`_.
 
 Versioning
 ~~~~~~~~~~
 
-By default, ``scrapyd-deploy`` uses the current timestamp for generating the project version, as
-shown above. However, you can pass a custom version using ``--version``::
+By default, ``scrapyd-deploy`` uses the current timestamp for generating the project version. You can pass a custom version using ``--version``:
+
+.. code-block:: shell
 
    scrapyd-deploy <target> -p <project> --version <version>
 
-The version must be comparable with `Version <https://github.com/scrapy/scrapyd/issues/426>`__. Scrapyd will use the greatest version unless specified.
+See `Scrapyd's documentation <https://scrapyd.readthedocs.io/en/latest/overview.html>`__ on how it determines the latest version.
 
 If you use Mercurial or Git, you can use ``HG`` or ``GIT`` respectively as the argument supplied to
 ``--version`` to use the current revision as the version. You can save yourself having to specify
@@ -104,40 +90,101 @@ the version parameter by adding it to your target's entry in ``scrapy.cfg``:
    ...
    version = HG
 
-Local Settings
+Note: The ``version`` keyword argument in the ``setup()`` function call in the ``setup.py`` file has no meaning to Scrapyd.
+
+Include dependencies
+~~~~~~~~~~~~~~~~~~~~
+
+#. Create a `requirements.txt <https://pip.pypa.io/en/latest/reference/requirements-file-format/>`__ file at the root of your project, alongside the ``scrapy.cfg`` file
+#. Use the ``--include-dependencies`` option when building or deploying your project:
+
+   .. code-block:: bash
+
+      scrapyd-deploy --include-dependencies
+
+Alternatively, you can install the dependencies directly on the Scrapyd server.
+
+Include data files
+~~~~~~~~~~~~~~~~~~
+
+#. Create a ``setup.py`` file at the root of your project, alongside the ``scrapy.cfg`` file, if you don't have one:
+
+   .. code-block:: shell
+
+      scrapyd-deploy --build-egg=/dev/null
+
+#. Set the ``package_data`` and ``include_package_data` keyword arguments in the ``setup()`` function call in the ``setup.py`` file. For example:
+
+   .. code-block:: python
+      :emphasize-lines: 8-9
+
+      from setuptools import setup, find_packages
+
+      setup(
+          name         = 'project',
+          version      = '1.0',
+          packages     = find_packages(),
+          entry_points = {'scrapy': ['settings = projectname.settings']},
+          package_data = {'projectname': ['path/to/*.json']},
+          include_package_data = True,
+      )
+
+Local settings
 ~~~~~~~~~~~~~~
 
-You may want to keep certain settings local and not have them deployed to Scrapyd. To accomplish
-this you can create a ``local_settings.py`` file at the root of your project, where your
-``scrapy.cfg`` file resides, and add the following to your project's settings:
+You may want to keep certain settings local and not have them deployed to Scrapyd.
 
-.. code-block:: python
+#. Create a ``local_settings.py`` file at the root of your project, alongside the ``scrapy.cfg`` file
+#. Add the following to your project's settings file:
 
-   try:
-       from local_settings import *
-   except ImportError:
-       pass
+   .. code-block:: python
 
-``scrapyd-deploy`` doesn't deploy anything outside of the project module, so the
-``local_settings.py`` file won't be deployed.
+      try:
+          from local_settings import *
+      except ImportError:
+          pass
 
-Egg Caveats
-~~~~~~~~~~~
+``scrapyd-deploy`` doesn't deploy anything outside of the project module, so the ``local_settings.py`` file won't be deployed.
 
-Some things to keep in mind when building eggs for your Scrapy project:
+Troubleshooting
+~~~~~~~~~~~~~~~
 
--  Make sure no local development settings are included in the egg when you build it. The
-   ``find_packages`` function may be picking up your custom settings. In most cases you want to
-   upload the egg with the default project settings.
--  Avoid using ``__file__`` in your project code as it doesn't play well with eggs.
-   Consider using `pkgutil.get_data`_ instead. Instead of:
+-  Problem: A settings file for local development is being included in the egg.
+
+   Solution: See `Local settings`_. Or, exclude the module from the egg. If using scrapyd-client's default ``setup.py`` file, change the ``find_package()`` call:
+
+   .. code-block:: python
+      :emphasize-lines: 4
+
+      setup(
+          name         = 'project',
+          version      = '1.0',
+          packages     = find_packages(),
+          entry_points = {'scrapy': ['settings = projectname.settings']},
+      )
+
+   to:
+
+   .. code-block:: python
+      :emphasize-lines: 4
+
+      setup(
+          name         = 'project',
+          version      = '1.0',
+          packages     = find_packages(exclude=["myproject.devsettings"]),
+          entry_points = {'scrapy': ['settings = projectname.settings']},
+      )
+
+-  Problem: Code using ``__file__`` breaks when run in Scrapyd.
+
+   Solution: Use `pkgutil.get_data <https://docs.python.org/library/pkgutil.html#pkgutil.get_data>`__ instead. For example, change:
 
    .. code-block:: python
 
       path = os.path.dirname(os.path.realpath(__file__))  # BAD
       open(os.path.join(path, "tools", "json", "test.json"), "rb").read()
 
-   Use:
+   to:
 
    .. code-block:: python
 
@@ -146,33 +193,15 @@ Some things to keep in mind when building eggs for your Scrapy project:
 
 -  Be careful when writing to disk in your project, as Scrapyd will most likely be running under a
    different user which may not have write access to certain directories. If you can, avoid writing
-   to disk and always use tempfile_ for temporary files.
-
-.. _pkgutil.get_data: https://docs.python.org/library/pkgutil.html#pkgutil.get_data
-.. _tempfile: https://docs.python.org/library/tempfile.html
-
-Including dependencies
-~~~~~~~~~~~~~~~~~~~~~~
-
-If your project has additional dependencies, you can either install them on the Scrapyd server, or
-you can include them in the project's egg, in two steps:
-
--  Create a `requirements.txt`_ file at the root of the project
--  Use the ``--include-dependencies`` option when building or deploying your project::
-
-      scrapyd-deploy --include-dependencies
-
-.. _requirements.txt: https://pip.pypa.io/en/latest/reference/requirements-file-format/
+   to disk and always use `tempfile <https://docs.python.org/library/tempfile.html>`__ for temporary files.
 
 scrapyd-client
 --------------
 
 For a reference on each subcommand invoke ``scrapyd-client <subcommand> --help``.
 
-Where filtering with wildcards is possible, it is facilitated with fnmatch_.
+Where filtering with wildcards is possible, it is facilitated with `fnmatch <https://docs.python.org/library/fnmatch.html>`__.
 The ``--project`` option can be omitted if one is found in a ``scrapy.cfg``.
-
-.. _fnmatch: https://docs.python.org/library/fnmatch.html
 
 deploy
 ~~~~~~
@@ -292,10 +321,8 @@ To list all available projects on one target, use the ``-L`` option::
    scrapyd-deploy -L example
 
 While your target needs to be defined with its URL in ``scrapy.cfg``,
-you can use netrc_ for username and password, like so::
+you can use `netrc <https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html>`__ for username and password, like so::
 
    machine scrapyd.example.com
        login scrapy
        password secret
-
-.. _netrc: https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html

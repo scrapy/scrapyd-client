@@ -25,6 +25,7 @@ setup(
     install_requires=[
         "uberegg>=0.1.1",
         "requests",
+        "setuptools",
         "scrapy>=0.17",
         "urllib3",
         "w3lib",
