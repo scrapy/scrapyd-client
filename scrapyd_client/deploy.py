@@ -20,7 +20,7 @@ from scrapy.utils.project import inside_project
 from urllib3.filepost import encode_multipart_formdata
 from w3lib.http import basic_auth_header
 
-from scrapyd_client.utils import get_auth, get_config, retry_on_eintr
+from scrapyd_client.utils import get_auth, get_config
 
 _SETUP_PY_TEMPLATE = """
 # Automatically created by: scrapyd-deploy
@@ -295,12 +295,7 @@ def _build_egg(opts):
     else:
         command = "bdist_egg"
 
-    retry_on_eintr(
-        check_call,
-        [sys.executable, "setup.py", "clean", "-a", command, "-d", d],
-        stdout=o,
-        stderr=e,
-    )
+    check_call([sys.executable, "setup.py", "clean", "-a", command, "-d", d], stdout=o, stderr=e)
     o.close()
     e.close()
 

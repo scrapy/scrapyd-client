@@ -112,16 +112,6 @@ def post_request(url, data, auth=None):
     return _process_response(response)
 
 
-def retry_on_eintr(function, *args, **kw):
-    """Run a function and retry it while getting EINTR errors."""
-    while True:
-        try:
-            return function(*args, **kw)
-        except IOError as e:
-            if e.errno != errno.EINTR:
-                raise
-
-
 def get_config(use_closest=True):
     """Get Scrapy config file as a ConfigParser."""
     sources = conf.get_sources(use_closest)
