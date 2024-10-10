@@ -99,11 +99,3 @@ def schedule(url, project, spider, args=[], username=None, password=None):
         auth=get_auth(url=url, username=username, password=password),
     )
     return response["jobid"]
-
-
-__all__ = [
-    get_projects.__name__,
-    get_spiders.__name__,
-    get_jobs.__name__,
-    schedule.__name__,
-]

@@ -128,13 +128,3 @@ def get_config(use_closest=True):
     cfg = ConfigParser(interpolation=EnvInterpolation())
     cfg.read(sources)
     return cfg
-
-
-__all__ = [
-    ErrorResponse.__name__,
-    MalformedResponse.__name__,
-    get_request.__name__,
-    indent.__name__,
-    post_request.__name__,
-    retry_on_eintr.__name__,
-]
