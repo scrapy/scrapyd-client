@@ -191,6 +191,9 @@ Troubleshooting
    different user which may not have write access to certain directories. If you can, avoid writing
    to disk and always use `tempfile <https://docs.python.org/library/tempfile.html>`__ for temporary files.
 
+-  If you use a proxy, use the ``HTTP_PROXY``, ``HTTPS_PROXY``, ``NO_PROXY`` and/or ``ALL_PROXY`` environment variables,
+   as documented by the `requests <https://docs.python-requests.org/en/latest/user/advanced/#proxies>`__ package.
+
 scrapyd-client
 --------------
 
