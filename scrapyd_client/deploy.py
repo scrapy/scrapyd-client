@@ -7,15 +7,12 @@ import sys
 import tempfile
 import time
 from argparse import ArgumentParser
-from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin
-from urllib.request import HTTPRedirectHandler as UrllibHTTPRedirectHandler
-from urllib.request import Request, build_opener, install_opener, urlopen
 
+import requests
+from requests.auth import HTTPBasicAuth
 from scrapy.utils.conf import closest_scrapy_cfg
 from scrapy.utils.project import inside_project
-from urllib3.filepost import encode_multipart_formdata
-from w3lib.http import basic_auth_header
 
 from scrapyd_client.utils import get_auth, get_config
 
@@ -69,8 +66,6 @@ def main():
         _log("Error: no Scrapy project found in this location")
         sys.exit(1)
 
-    install_opener(build_opener(HTTPRedirectHandler))
-
     if opts.list_targets:
         for name, target in _get_targets().items():
             print("%-20s %s" % (name, target["url"]))
@@ -78,10 +73,8 @@ def main():
 
     if opts.list_projects:
         target = _get_target(opts.list_projects)
-        request = Request(_url(target, "listprojects.json"))
-        _add_auth_header(request, target)
-        response = urlopen(request)
-        projects = json.loads(response.read())["projects"]
+
+        projects = requests.get(_url(target, "listprojects.json"), **_requests_auth(target)).json()["projects"]
         print(os.linesep.join(projects))
         return
 
@@ -130,44 +123,35 @@ def _build_egg_and_deploy_target(target, version, opts):
         _log(f"Packing version {version}")
         eggpath, tmpdir = _build_egg(opts)
 
-    # Upload egg.
-    with open(eggpath, "rb") as f:
-        eggdata = f.read()
-    data = {
-        "project": project,
-        "version": version,
-        "egg": ("project.egg", eggdata),
-    }
-    body, content_type = encode_multipart_formdata(data)
     url = _url(target, "addversion.json")
-    headers = {
-        "Content-Type": content_type,
-        "Content-Length": str(len(body)),
-    }
-    request = Request(url, body, headers)
-    _add_auth_header(request, target)
     _log(f'Deploying to project "{project}" in {url}')
 
-    # POST request.
+    # Upload egg.
     try:
-        response = urlopen(request)
-        _log(f"Server response ({response.code}):")
-        print(response.read().decode())
-    except HTTPError as e:
-        _log(f"Deploy failed ({e.code}):")
+        with open(eggpath, "rb") as f:
+            response = requests.post(
+                _url(target, "addversion.json"),
+                data={"project": project, "version": version},
+                files=[("egg", ("project.egg", f))],
+                **_requests_auth(target),
+            )
+        response.raise_for_status()
+        _log(f"Server response ({response.status_code}):")
+        print(response.text)
+    except requests.HTTPError as e:
+        _log(f"Deploy failed ({e.response.status_code}):")
         exitcode = 1
-        response = e.read().decode()
         try:
-            data = json.loads(response)
-        except ValueError:
-            print(response)
+            data = e.response.json()
+        except json.decoder.JSONDecodeError:
+            print(e.response.text)
         else:
             if "status" in data and "message" in data:
-                print("Status: {status}".format(**data))
-                print("Message:\n{message}".format(**data))
+                print(f"Status: {data['status']}")
+                print(f"Message:\n{data['message']}")
             else:
                 print(json.dumps(data, indent=3))
-    except URLError as e:
+    except requests.RequestException as e:
         _log(f"Deploy failed: {e}")
         exitcode = 1
 
@@ -243,14 +227,10 @@ def _get_version(target, opts):
     return str(int(time.time()))
 
 
-def _add_auth_header(request, target):
-    url, username, password = (
-        target["url"],
-        target.get("username"),
-        target.get("password", ""),
-    )
-    if auth := get_auth(url=url, username=username, password=password):
-        request.add_header("Authorization", basic_auth_header(auth.username, auth.password))
+def _requests_auth(target):
+    if auth := get_auth(url=target["url"], username=target.get("username"), password=target.get("password", "")):
+        return {"auth": HTTPBasicAuth(auth.username, auth.password)}
+    return {}
 
 
 def _build_egg(opts):
@@ -275,32 +255,6 @@ def _build_egg(opts):
 
     eggpath = glob.glob(os.path.join(tmpdir, "*.egg"))[0]
     return eggpath, tmpdir
-
-
-class HTTPRedirectHandler(UrllibHTTPRedirectHandler):
-    def redirect_request(self, request, fp, code, msg, headers, newurl):
-        newurl = newurl.replace(" ", "%20")
-        if code in (301, 307):
-            return Request(
-                newurl,
-                data=request.get_data(),
-                headers=request.headers,
-                origin_req_host=request.get_origin_req_host(),
-                unverifiable=True,
-            )
-        if code in (302, 303):
-            newheaders = {
-                header: value
-                for header, value in request.headers.items()
-                if header.lower() not in ("content-length", "content-type")
-            }
-            return Request(
-                newurl,
-                headers=newheaders,
-                origin_req_host=request.get_origin_req_host(),
-                unverifiable=True,
-            )
-        raise HTTPError(request.get_full_url(), code, msg, headers, fp)
 
 
 if __name__ == "__main__":

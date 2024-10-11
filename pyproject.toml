@@ -30,8 +30,6 @@ dependencies = [
     "scrapy>=0.17",
     "setuptools",
     "uberegg>=0.1.1",
-    "urllib3",
-    "w3lib",
 ]
 
 [project.optional-dependencies]

@@ -1,11 +1,11 @@
+import json
 import os
 import re
-from io import BytesIO
 from textwrap import dedent
-from unittest.mock import patch
-from urllib.error import HTTPError, URLError
+from unittest.mock import MagicMock, patch
 
 import pytest
+import requests
 
 
 def _write_conf_file(content):
@@ -304,10 +304,9 @@ def test_build_egg_inc_dependencies_with_dep(script_runner, project_with_depende
 
 
 def test_deploy_success(script_runner, conf_default_target):
-    with patch("scrapyd_client.deploy.urlopen") as mocked:
-        # https://scrapyd.readthedocs.io/en/stable/api.html#addversion-json
-        mocked.return_value.code = 200
-        mocked.return_value.read.side_effect = lambda: b'{"status": "ok"}'
+    with patch("scrapyd_client.deploy.requests.post") as mocked:
+        mocked.return_value.status_code = 200
+        mocked.return_value.text = '{"status": "ok"}'
 
         ret = script_runner.run(["scrapyd-deploy"])
 
@@ -326,27 +325,26 @@ def test_deploy_success(script_runner, conf_default_target):
 @pytest.mark.parametrize(
     ("content", "expected"),
     [
-        (b"content", "content"),
-        (b'["content"]', '[\n   "content"\n]'),
+        ("content", "content"),
+        (["content"], '[\n   "content"\n]'),
         (
-            b'{"status": "error", "message": "content"}',
+            {"status": "error", "message": "content"},
             "Status: error\nMessage:\ncontent",
         ),
     ],
 )
 def test_deploy_httperror(content, expected, script_runner, conf_default_target):
-    with patch("scrapyd_client.deploy.urlopen") as mocked:
-        # https://scrapyd.readthedocs.io/en/stable/api.html#addversion-json
-        mocked.side_effect = HTTPError(
-            url="http://localhost:6800/addversion.json",
-            msg="msg",
-            hdrs="hdrs",
-            code=404,
-            fp=BytesIO(content),
-        )
+    with patch("scrapyd_client.deploy.requests.post") as mocked:
+        response = MagicMock(status_code=404, text=content)
+        if isinstance(content, (dict, list)):
+            response.json.side_effect = lambda: content
+        else:
+            response.json.side_effect = json.decoder.JSONDecodeError("", "", 0)
+        mocked.side_effect = requests.HTTPError(response=response)
 
         ret = script_runner.run(["scrapyd-deploy"])
 
+        assert ret.returncode == 1
         assert_lines(ret.stdout, f"{expected}")
         assert_lines(
             ret.stderr,
@@ -356,23 +354,21 @@ def test_deploy_httperror(content, expected, script_runner, conf_default_target)
                 r"Deploy failed \(404\):",
             ],
         )
-        assert not ret.success
 
 
 def test_deploy_urlerror(script_runner, conf_default_target):
-    with patch("scrapyd_client.deploy.urlopen") as mocked:
-        # https://scrapyd.readthedocs.io/en/stable/api.html#addversion-json
-        mocked.side_effect = URLError(reason="content")
+    with patch("scrapyd_client.deploy.requests.post") as mocked:
+        mocked.side_effect = requests.RequestException("content")
 
         ret = script_runner.run(["scrapyd-deploy"])
 
+        assert ret.returncode == 1
         assert ret.stdout == ""
         assert_lines(
             ret.stderr,
             [
                 r"Packing version \d+",
                 r'Deploying to project "scrapydproject" in http://localhost:6800/addversion\.json',
-                r"Deploy failed: <urlopen error content>",
+                r"Deploy failed: content",
             ],
         )
-        assert not ret.success

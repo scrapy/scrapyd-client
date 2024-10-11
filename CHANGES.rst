@@ -23,6 +23,7 @@ Fixed
 Removed
 ^^^^^^^
 
+- Remove ``urllib3`` and ``w3lib`` requirements.
 - Drop support for Python 3.7, 3.8.
 
 1.2.3 (2023-01-30)
