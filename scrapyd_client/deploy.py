@@ -142,8 +142,48 @@ def _build_egg_and_deploy_target(target, version, opts):
     else:
         _log("Packing version %s" % version)
         eggpath, tmpdir = _build_egg(opts)
-    if not _upload_egg(target, egg, project, version):
+
+    # Upload egg.
+    with open(eggpath, "rb") as f:
+        eggdata = f.read()
+    data = {
+        "project": project,
+        "version": version,
+        "egg": ("project.egg", eggdata),
+    }
+    body, content_type = encode_multipart_formdata(data)
+    url = _url(target, "addversion.json")
+    headers = {
+        "Content-Type": content_type,
+        "Content-Length": str(len(body)),
+    }
+    request = Request(url, body, headers)
+    _add_auth_header(request, target)
+    _log('Deploying to project "%s" in %s' % (project, url))
+
+    # POST request.
+    try:
+        response = urlopen(request)
+        _log("Server response (%s):" % response.code)
+        print(response.read().decode())
+    except HTTPError as e:
+        _log("Deploy failed (%s):" % e.code)
         exitcode = 1
+        response = e.read().decode()
+        try:
+            data = json.loads(response)
+        except ValueError:
+            print(response)
+        else:
+            if "status" in data and "message" in data:
+                print("Status: %(status)s" % data)
+                print("Message:\n%(message)s" % data)
+            else:
+                print(json.dumps(data, indent=3))
+    except URLError as e:
+        _log("Deploy failed: %s" % e)
+        exitcode = 1
+
     return exitcode, tmpdir
 
 
@@ -217,25 +257,6 @@ def _get_version(target, opts):
         return str(int(time.time()))
 
 
-def _upload_egg(target, eggpath, project, version):
-    with open(eggpath, "rb") as f:
-        eggdata = f.read()
-    data = {
-        "project": project,
-        "version": version,
-        "egg": ("project.egg", eggdata),
-    }
-    body, content_type = encode_multipart_formdata(data)
-    url = _url(target, "addversion.json")
-    headers = {
-        "Content-Type": content_type,
-        "Content-Length": str(len(body)),
-    }
-    request = Request(url, body, headers)
-    _add_auth_header(request, target)
-    _log('Deploying to project "%s" in %s' % (project, url))
-    return _http_post(request)
-
 
 def _add_auth_header(request, target):
     url, username, password = (
@@ -248,29 +269,6 @@ def _add_auth_header(request, target):
         request.add_header(
             "Authorization", basic_auth_header(auth.username, auth.password)
         )
-
-
-def _http_post(request):
-    try:
-        response = urlopen(request)
-        _log("Server response (%s):" % response.code)
-        print(response.read().decode())
-        return True
-    except HTTPError as e:
-        _log("Deploy failed (%s):" % e.code)
-        response = e.read().decode()
-        try:
-            data = json.loads(response)
-        except ValueError:
-            print(response)
-        else:
-            if "status" in data and "message" in data:
-                print("Status: %(status)s" % data)
-                print("Message:\n%(message)s" % data)
-            else:
-                print(json.dumps(data, indent=3))
-    except URLError as e:
-        _log("Deploy failed: %s" % e)
 
 
 def _build_egg(opts):
