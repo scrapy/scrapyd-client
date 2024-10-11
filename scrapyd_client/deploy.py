@@ -91,10 +91,10 @@ def main():
 
     if opts.list_projects:
         target = _get_target(opts.list_projects)
-        req = Request(_url(target, "listprojects.json"))
-        _add_auth_header(req, target)
-        f = urlopen(req)
-        projects = json.loads(f.read())["projects"]
+        request = Request(_url(target, "listprojects.json"))
+        _add_auth_header(request, target)
+        response = urlopen(request)
+        projects = json.loads(response.read())["projects"]
         print(os.linesep.join(projects))
         return
 
@@ -166,11 +166,11 @@ def _get_targets():
     targets = {}
     if "url" in baset:
         targets["default"] = baset
-    for x in cfg.sections():
-        if x.startswith("deploy:"):
+    for section in cfg.sections():
+        if section.startswith("deploy:"):
             t = baset.copy()
-            t.update(cfg.items(x))
-            targets[x[7:]] = t
+            t.update(cfg.items(section))
+            targets[section[7:]] = t
     return targets
 
 
@@ -190,31 +190,31 @@ def _url(target, action):
 def _get_version(target, opts):
     version = opts.version or target.get("version")
     if version == "HG":
-        p = subprocess.Popen(
+        process = subprocess.Popen(
             ["hg", "tip", "--template", "{rev}"], stdout=subprocess.PIPE, universal_newlines=True
         )
-        d = "r%s" % p.communicate()[0]
-        p = subprocess.Popen(["hg", "branch"], stdout=subprocess.PIPE, universal_newlines=True)
-        b = p.communicate()[0].strip("\n")
-        return "%s-%s" % (d, b)
+        descriptor = "r%s" % process.communicate()[0]
+        process = subprocess.Popen(["hg", "branch"], stdout=subprocess.PIPE, universal_newlines=True)
+        name = process.communicate()[0].strip("\n")
+        return "%s-%s" % (descriptor, name)
     elif version == "GIT":
-        p = subprocess.Popen(["git", "describe"], stdout=subprocess.PIPE, universal_newlines=True)
-        d = p.communicate()[0].strip("\n")
-        if p.wait() != 0:
-            p = subprocess.Popen(
+        process = subprocess.Popen(["git", "describe"], stdout=subprocess.PIPE, universal_newlines=True)
+        descriptor = process.communicate()[0].strip("\n")
+        if process.wait() != 0:
+            process = subprocess.Popen(
                 ["git", "rev-list", "--count", "HEAD"],
                 stdout=subprocess.PIPE,
                 universal_newlines=True,
             )
-            d = "r%s" % p.communicate()[0].strip("\n")
+            descriptor = "r%s" % process.communicate()[0].strip("\n")
 
-        p = subprocess.Popen(
+        process = subprocess.Popen(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
-        b = p.communicate()[0].strip("\n")
-        return "%s-%s" % (d, b)
+        name = process.communicate()[0].strip("\n")
+        return "%s-%s" % (descriptor, name)
     elif version:
         return version
     else:
@@ -235,10 +235,10 @@ def _upload_egg(target, eggpath, project, version):
         "Content-Type": content_type,
         "Content-Length": str(len(body)),
     }
-    req = Request(url, body, headers)
-    _add_auth_header(req, target)
+    request = Request(url, body, headers)
+    _add_auth_header(request, target)
     _log('Deploying to project "%s" in %s' % (project, url))
-    return _http_post(req)
+    return _http_post(request)
 
 
 def _add_auth_header(request, target):
@@ -256,23 +256,23 @@ def _add_auth_header(request, target):
 
 def _http_post(request):
     try:
-        f = urlopen(request)
-        _log("Server response (%s):" % f.code)
-        print(f.read().decode())
+        response = urlopen(request)
+        _log("Server response (%s):" % response.code)
+        print(response.read().decode())
         return True
     except HTTPError as e:
         _log("Deploy failed (%s):" % e.code)
-        resp = e.read().decode()
+        response = e.read().decode()
         try:
-            d = json.loads(resp)
+            data = json.loads(response)
         except ValueError:
-            print(resp)
+            print(response)
         else:
-            if "status" in d and "message" in d:
-                print("Status: %(status)s" % d)
-                print("Message:\n%(message)s" % d)
+            if "status" in data and "message" in data:
+                print("Status: %(status)s" % data)
+                print("Message:\n%(message)s" % data)
             else:
-                print(json.dumps(d, indent=3))
+                print(json.dumps(data, indent=3))
     except URLError as e:
         _log("Deploy failed: %s" % e)
 
@@ -283,9 +283,9 @@ def _build_egg(opts):
     if not os.path.exists("setup.py"):
         settings = get_config().get("settings", "default")
         _create_default_setup_py(settings=settings)
-    d = tempfile.mkdtemp(prefix="scrapydeploy-")
-    o = open(os.path.join(d, "stdout"), "wb")
-    e = open(os.path.join(d, "stderr"), "wb")
+    tmpdir = tempfile.mkdtemp(prefix="scrapydeploy-")
+    out = open(os.path.join(tmpdir, "stdout"), "wb")
+    err = open(os.path.join(tmpdir, "stderr"), "wb")
 
     if opts.include_dependencies:
         _log("Including dependencies from requirements.txt")
@@ -295,13 +295,13 @@ def _build_egg(opts):
     else:
         command = "bdist_egg"
 
-    subprocess.check_call([sys.executable, "setup.py", "clean", "-a", command, "-d", d], stdout=o, stderr=e)
+    subprocess.check_call([sys.executable, "setup.py", "clean", "-a", command, "-d", tmpdir], stdout=out, stderr=err)
 
-    o.close()
-    e.close()
+    out.close()
+    err.close()
 
-    egg = glob.glob(os.path.join(d, "*.egg"))[0]
-    return egg, d
+    egg = glob.glob(os.path.join(tmpdir, "*.egg"))[0]
+    return egg, tmpdir
 
 
 def _create_default_setup_py(**kwargs):
@@ -310,30 +310,30 @@ def _create_default_setup_py(**kwargs):
 
 
 class HTTPRedirectHandler(UrllibHTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
+    def redirect_request(self, request, fp, code, msg, headers, newurl):
         newurl = newurl.replace(" ", "%20")
         if code in (301, 307):
             return Request(
                 newurl,
-                data=req.get_data(),
-                headers=req.headers,
-                origin_req_host=req.get_origin_req_host(),
+                data=request.get_data(),
+                headers=request.headers,
+                origin_req_host=request.get_origin_req_host(),
                 unverifiable=True,
             )
         elif code in (302, 303):
             newheaders = dict(
-                (k, v)
-                for k, v in req.headers.items()
-                if k.lower() not in ("content-length", "content-type")
+                (header, value)
+                for header, value in request.headers.items()
+                if header.lower() not in ("content-length", "content-type")
             )
             return Request(
                 newurl,
                 headers=newheaders,
-                origin_req_host=req.get_origin_req_host(),
+                origin_req_host=request.get_origin_req_host(),
                 unverifiable=True,
             )
         else:
-            raise HTTPError(req.get_full_url(), code, msg, headers, fp)
+            raise HTTPError(request.get_full_url(), code, msg, headers, fp)
 
 
 if __name__ == "__main__":
