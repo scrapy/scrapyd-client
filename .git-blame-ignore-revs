@@ -1,2 +1,3 @@
-29d6b6907fdc3c49f6bc35ca41a2a89e972e6db6 # black
 b8f03726fdf364456b00e4ff47247ee699df2186 # flake8
+29d6b6907fdc3c49f6bc35ca41a2a89e972e6db6 # black
+cdf4e55f9fae36c05decd6bef7ee5fcb1a467ca1 # ruff
