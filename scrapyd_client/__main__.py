@@ -68,37 +68,34 @@ def spiders(args):
 def parse_cli_args(args):
     cfg = get_config()
 
-    target_default = cfg.get("deploy", "url", fallback=DEFAULT_TARGET_URL).rstrip("/")
-    username_default = cfg.get("deploy", "username", fallback=None)
-    password_default = cfg.get("deploy", "password", fallback=None)
-    project_default = cfg.get("deploy", "project", fallback=None)
     project_kwargs = {
         "metavar": "PROJECT",
         "required": True,
         "help": "Specifies the project, can be a globbing pattern.",
     }
-    if project_default:
+    if project_default := cfg.get("deploy", "project", fallback=None):
         project_kwargs["default"] = project_default
 
     description = "A command line interface for Scrapyd."
     mainparser = ArgumentParser(description=description)
     subparsers = mainparser.add_subparsers()
+
     mainparser.add_argument(
         "-t",
         "--target",
-        default=target_default,
+        default=cfg.get("deploy", "url", fallback=DEFAULT_TARGET_URL).rstrip("/"),
         help="Specifies the Scrapyd's API base URL.",
     )
     mainparser.add_argument(
         "-u",
         "--username",
-        default=username_default,
+        default=cfg.get("deploy", "username", fallback=None),
         help="Specifies the username to connect to the Scrapyd target.",
     )
     mainparser.add_argument(
         "-p",
         "--password",
-        default=password_default,
+        default=cfg.get("deploy", "password", fallback=None),
         help="Specifies the password to connect to the Scrapyd target.",
     )
 

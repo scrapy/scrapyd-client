@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import netrc
 import os
 from configparser import BasicInterpolation, ConfigParser
@@ -17,19 +19,8 @@ class EnvInterpolation(BasicInterpolation):
         return os.path.expandvars(value)
 
 
-def get_auth(url, username, password):
-    """
-    Retrieve authentication from arguments or infers from .netrc.
-
-    :param url: The URL to check.
-    :type url: str
-    :param username: The username to use.
-    :type username: str
-    :param password: The password to use.
-    :type password: str
-    :returns: An HTTPBasicAuth object or None.
-    :rtype: requests.auth.HTTPBasicAuth or None
-    """
+def get_auth(url: str, username: str, password: str) -> HTTPBasicAuth | None:
+    """Retrieve authentication from arguments or infers from .netrc."""
     if username:
         return HTTPBasicAuth(username=username, password=password)
 
