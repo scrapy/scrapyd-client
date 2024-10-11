@@ -4,6 +4,11 @@ History
 1.3.0 (Unreleased)
 ~~~~~~~~~~~~~~~~~~
 
+Changed
+^^^^^^^
+
+- The ``scrapyd_client.lib.schedule`` and ``scrapyd_client.ScrapyClient.schedule`` methods accept ``args`` as a list, instead of as a dict.
+
 Fixed
 ^^^^^
 
