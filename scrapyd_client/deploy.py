@@ -56,14 +56,14 @@ def main():
     opts = parse_args()
     exitcode = 0
     if not inside_project():
-        _log("Error: no Scrapy project found in this location")
+        print("Error: no Scrapy project found in this location", file=sys.stderr)
         sys.exit(1)
 
     tmpdir = None
 
     if opts.build_egg:  # build egg only
         eggpath, tmpdir = _build_egg(opts)
-        _log(f"Writing egg to {opts.build_egg}")
+        print(f"Writing egg to {opts.build_egg}", file=sys.stderr)
         shutil.copyfile(eggpath, opts.build_egg)
     elif opts.deploy_all_targets:
         version = None
@@ -76,7 +76,8 @@ def main():
         try:
             target = _get_targets()[opts.target]
         except KeyError:
-            raise _fail(f"Unknown target: {opts.target}") from None
+            print(f"Unknown target: {opts.target}", file=sys.stderr)
+            sys.exit(1)
 
         version = _get_version(target, opts)
         exitcode, tmpdir = _build_egg_and_deploy_target(target, version, opts)
@@ -88,7 +89,7 @@ def main():
 def _remove_tmpdir(tmpdir, opts):
     if tmpdir:
         if opts.debug:
-            _log(f"Output dir not removed: {tmpdir}")
+            print(f"Output dir not removed: {tmpdir}", file=sys.stderr)
         else:
             shutil.rmtree(tmpdir)
 
@@ -99,17 +100,18 @@ def _build_egg_and_deploy_target(target, version, opts):
 
     project = opts.project or target.get("project")
     if not project:
-        raise _fail("Error: Missing project")
+        print("Error: Missing project", file=sys.stderr)
+        sys.exit(1)
 
     if opts.egg:
-        _log(f"Using egg: {opts.egg}")
+        print(f"Using egg: {opts.egg}", file=sys.stderr)
         eggpath = opts.egg
     else:
-        _log(f"Packing version {version}")
+        print(f"Packing version {version}", file=sys.stderr)
         eggpath, tmpdir = _build_egg(opts)
 
     url = _url(target, "addversion.json")
-    _log(f'Deploying to project "{project}" in {url}')
+    print(f'Deploying to project "{project}" in {url}', file=sys.stderr)
 
     # Upload egg.
     kwargs = {}
@@ -125,10 +127,10 @@ def _build_egg_and_deploy_target(target, version, opts):
                 **kwargs,
             )
         response.raise_for_status()
-        _log(f"Server response ({response.status_code}):")
+        print(f"Server response ({response.status_code}):", file=sys.stderr)
         print(response.text)
     except requests.HTTPError as e:
-        _log(f"Deploy failed ({e.response.status_code}):")
+        print(f"Deploy failed ({e.response.status_code}):", file=sys.stderr)
         exitcode = 1
         try:
             data = e.response.json()
@@ -141,25 +143,17 @@ def _build_egg_and_deploy_target(target, version, opts):
             else:
                 print(json.dumps(data, indent=3))
     except requests.RequestException as e:
-        _log(f"Deploy failed: {e}")
+        print(f"Deploy failed: {e}", file=sys.stderr)
         exitcode = 1
 
     return exitcode, tmpdir
 
 
-def _log(message):
-    sys.stderr.write(f"{message}{os.linesep}")
-
-
-def _fail(message, code=1):
-    _log(message)
-    sys.exit(code)
-
-
 def _url(target, action):
     if "url" in target:
         return urljoin(target["url"], action)
-    raise _fail("Error: Missing url for project")
+    print("Error: Missing url for project", file=sys.stderr)
+    sys.exit(1)
 
 
 def _get_version(target, opts):
@@ -205,9 +199,10 @@ def _build_egg(opts):
     tmpdir = tempfile.mkdtemp(prefix="scrapydeploy-")
 
     if opts.include_dependencies:
-        _log("Including dependencies from requirements.txt")
+        print("Including dependencies from requirements.txt", file=sys.stderr)
         if not os.path.isfile("requirements.txt"):
-            _fail("Error: Missing requirements.txt")
+            print("Error: Missing requirements.txt", file=sys.stderr)
+            sys.exit(1)
         command = "bdist_uberegg"
     else:
         command = "bdist_egg"
