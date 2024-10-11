@@ -288,7 +288,7 @@ def test_build_egg_inc_dependencies_no_dep(script_runner, project):
 
 
 def test_build_egg_inc_dependencies_with_dep(script_runner, project_with_dependencies):
-    ret = script_runner.run(["scrapyd-deploy", "--include-dependencies", "--build-egg", "myegg-deps.egg"])
+    ret = script_runner.run(["scrapyd-deploy", "--include-dependencies", "--build-egg", "myegg-deps.egg", "--debug"])
 
     assert ret.stdout == ""
     assert_lines(

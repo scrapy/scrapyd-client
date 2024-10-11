@@ -12,13 +12,15 @@ Added
 Changed
 ^^^^^^^
 
-- The ``scrapyd-deploy --debug`` option prints the subprocess' standard output and standard error, instead of writing to ``stdout`` and ``stderr`` files.
+- The ``scrapyd-client schedule`` subcommand accepts multiple ``--arg setting=...`` arguments. (@mxdev88)
 - The ``scrapyd_client.lib.schedule`` and ``scrapyd_client.ScrapyClient.schedule`` methods accept ``args`` as a list, instead of as a dict.
+- The ``scrapyd-deploy --debug`` option prints the subprocess' standard output and standard error, instead of writing to ``stdout`` and ``stderr`` files.
 
 Fixed
 ^^^^^
 
-- The ``scrapyd-client schedule`` subcommand accepts multiple ``--arg setting=...`` arguments. (@mxdev88)
+- Run ``clean`` separately from building the egg. (Setuptools caches the Python packages from before ``clean`` runs.)
+- Add ``pip`` requirement for ``uberegg``.
 
 Removed
 ^^^^^^^

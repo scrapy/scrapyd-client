@@ -26,6 +26,7 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
+    "pip",  # uberegg
     "requests",
     "scrapy>=0.17",
     "setuptools",
@@ -34,9 +35,9 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
+    "coverage",
     "pytest",
     "pytest-console-scripts",
-    "pytest-cov",
     "pytest-mock",
 ]
 
