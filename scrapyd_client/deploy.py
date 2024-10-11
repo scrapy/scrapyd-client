@@ -132,7 +132,10 @@ def _build_egg_and_deploy_target(target, version, opts):
     exitcode = 0
     tmpdir = None
 
-    project = _get_project(target, opts)
+    project = opts.project or target.get("project")
+    if not project:
+        raise _fail("Error: Missing project")
+
     if opts.egg:
         _log("Using egg: %s" % opts.egg)
         egg = opts.egg
@@ -151,13 +154,6 @@ def _log(message):
 def _fail(message, code=1):
     _log(message)
     sys.exit(code)
-
-
-def _get_project(target, opts):
-    project = opts.project or target.get("project")
-    if not project:
-        raise _fail("Error: Missing project")
-    return project
 
 
 def _get_targets():
