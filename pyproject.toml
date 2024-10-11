@@ -1,6 +1,6 @@
 [tool.ruff]
 line-length = 119
-target-version = "py311"
+target-version = "py39"
 
 [tool.ruff.lint]
 select = ["ALL"]

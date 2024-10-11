@@ -4,6 +4,11 @@ History
 1.3.0 (Unreleased)
 ~~~~~~~~~~~~~~~~~~
 
+Added
+^^^^^
+
+- Add support for Python 3.12.
+
 Changed
 ^^^^^^^
 
@@ -14,6 +19,11 @@ Fixed
 ^^^^^
 
 - The ``scrapyd-client schedule`` subcommand accepts multiple ``--arg setting=...`` arguments. (@mxdev88)
+
+Removed
+^^^^^^^
+
+- Drop support for Python 3.7, 3.8.
 
 1.2.3 (2023-01-30)
 ~~~~~~~~~~~~~~~~~~
