@@ -101,9 +101,9 @@ def main():
     tmpdir = None
 
     if opts.build_egg:  # build egg only
-        egg, tmpdir = _build_egg(opts)
+        eggpath, tmpdir = _build_egg(opts)
         _log("Writing egg to %s" % opts.build_egg)
-        shutil.copyfile(egg, opts.build_egg)
+        shutil.copyfile(eggpath, opts.build_egg)
     elif opts.deploy_all_targets:
         version = None
         for name, target in _get_targets().items():
@@ -138,10 +138,10 @@ def _build_egg_and_deploy_target(target, version, opts):
 
     if opts.egg:
         _log("Using egg: %s" % opts.egg)
-        egg = opts.egg
+        eggpath = opts.egg
     else:
         _log("Packing version %s" % version)
-        egg, tmpdir = _build_egg(opts)
+        eggpath, tmpdir = _build_egg(opts)
     if not _upload_egg(target, egg, project, version):
         exitcode = 1
     return exitcode, tmpdir
@@ -293,8 +293,8 @@ def _build_egg(opts):
     kwargs = {} if opts.debug else {"stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL}
     process = subprocess.run([sys.executable, "setup.py", "clean", "-a", command, "-d", tmpdir], check=True, **kwargs)
 
-    egg = glob.glob(os.path.join(tmpdir, "*.egg"))[0]
-    return egg, tmpdir
+    eggpath = glob.glob(os.path.join(tmpdir, "*.egg"))[0]
+    return eggpath, tmpdir
 
 
 class HTTPRedirectHandler(UrllibHTTPRedirectHandler):
