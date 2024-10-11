@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 from scrapyd_client import lib
 from scrapyd_client.utils import DEFAULT_TARGET_URL
