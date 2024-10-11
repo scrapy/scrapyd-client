@@ -334,7 +334,7 @@ def test_deploy_success(script_runner, conf_default_target):
 
 
 @pytest.mark.parametrize(
-    "content,expected",
+    ("content", "expected"),
     [
         (b"content", "content"),
         (b'["content"]', '[\n   "content"\n]'),

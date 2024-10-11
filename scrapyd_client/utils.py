@@ -71,7 +71,7 @@ def get_auth(url, username, password):
         return None
 
 
-def get_request(url, params={}, auth=None):
+def get_request(url, params=None, auth=None):
     """
     Dispatches a request with GET method.
 
@@ -82,6 +82,8 @@ def get_request(url, params={}, auth=None):
     :returns: The processed response.
     :rtype: mapping
     """
+    if params is None:
+        params = {}
     return _process_response(requests.get(url, params=params, headers=HEADERS, auth=auth))
 
 

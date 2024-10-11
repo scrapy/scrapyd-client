@@ -102,7 +102,7 @@ def main():
 
     if opts.build_egg:  # build egg only
         eggpath, tmpdir = _build_egg(opts)
-        _log("Writing egg to %s" % opts.build_egg)
+        _log(f"Writing egg to {opts.build_egg}")
         shutil.copyfile(eggpath, opts.build_egg)
     elif opts.deploy_all_targets:
         version = None
@@ -123,7 +123,7 @@ def main():
 def _remove_tmpdir(tmpdir, opts):
     if tmpdir:
         if opts.debug:
-            _log("Output dir not removed: %s" % tmpdir)
+            _log(f"Output dir not removed: {tmpdir}")
         else:
             shutil.rmtree(tmpdir)
 
@@ -137,10 +137,10 @@ def _build_egg_and_deploy_target(target, version, opts):
         raise _fail("Error: Missing project")
 
     if opts.egg:
-        _log("Using egg: %s" % opts.egg)
+        _log(f"Using egg: {opts.egg}")
         eggpath = opts.egg
     else:
-        _log("Packing version %s" % version)
+        _log(f"Packing version {version}")
         eggpath, tmpdir = _build_egg(opts)
 
     # Upload egg.
@@ -159,15 +159,15 @@ def _build_egg_and_deploy_target(target, version, opts):
     }
     request = Request(url, body, headers)
     _add_auth_header(request, target)
-    _log('Deploying to project "%s" in %s' % (project, url))
+    _log(f'Deploying to project "{project}" in {url}')
 
     # POST request.
     try:
         response = urlopen(request)
-        _log("Server response (%s):" % response.code)
+        _log(f"Server response ({response.code}):")
         print(response.read().decode())
     except HTTPError as e:
-        _log("Deploy failed (%s):" % e.code)
+        _log(f"Deploy failed ({e.code}):")
         exitcode = 1
         response = e.read().decode()
         try:
@@ -176,12 +176,12 @@ def _build_egg_and_deploy_target(target, version, opts):
             print(response)
         else:
             if "status" in data and "message" in data:
-                print("Status: %(status)s" % data)
-                print("Message:\n%(message)s" % data)
+                print("Status: {status}".format(**data))
+                print("Message:\n{message}".format(**data))
             else:
                 print(json.dumps(data, indent=3))
     except URLError as e:
-        _log("Deploy failed: %s" % e)
+        _log(f"Deploy failed: {e}")
         exitcode = 1
 
     return exitcode, tmpdir
@@ -214,7 +214,7 @@ def _get_target(name):
     try:
         return _get_targets()[name]
     except KeyError:
-        raise _fail("Unknown target: %s" % name)
+        raise _fail(f"Unknown target: {name}")
 
 
 def _url(target, action):
@@ -229,10 +229,10 @@ def _get_version(target, opts):
         process = subprocess.Popen(
             ["hg", "tip", "--template", "{rev}"], stdout=subprocess.PIPE, universal_newlines=True
         )
-        descriptor = "r%s" % process.communicate()[0]
+        descriptor = f"r{process.communicate()[0]}"
         process = subprocess.Popen(["hg", "branch"], stdout=subprocess.PIPE, universal_newlines=True)
         name = process.communicate()[0].strip("\n")
-        return "%s-%s" % (descriptor, name)
+        return f"{descriptor}-{name}"
     if version == "GIT":
         process = subprocess.Popen(["git", "describe"], stdout=subprocess.PIPE, universal_newlines=True)
         descriptor = process.communicate()[0].strip("\n")
@@ -242,7 +242,7 @@ def _get_version(target, opts):
                 stdout=subprocess.PIPE,
                 universal_newlines=True,
             )
-            descriptor = "r%s" % process.communicate()[0].strip("\n")
+            descriptor = "r{}".format(process.communicate()[0].strip("\n"))
 
         process = subprocess.Popen(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
@@ -250,7 +250,7 @@ def _get_version(target, opts):
             universal_newlines=True,
         )
         name = process.communicate()[0].strip("\n")
-        return "%s-%s" % (descriptor, name)
+        return f"{descriptor}-{name}"
     if version:
         return version
     return str(int(time.time()))
@@ -305,11 +305,11 @@ class HTTPRedirectHandler(UrllibHTTPRedirectHandler):
                 unverifiable=True,
             )
         if code in (302, 303):
-            newheaders = dict(
-                (header, value)
+            newheaders = {
+                header: value
                 for header, value in request.headers.items()
                 if header.lower() not in ("content-length", "content-type")
-            )
+            }
             return Request(
                 newurl,
                 headers=newheaders,

@@ -7,7 +7,7 @@ class ScrapydClient:
     """ScrapydClient to interact with a Scrapyd instance."""
 
     def __init__(
-        self, url: str = DEFAULT_TARGET_URL, username: str = None, password: str = None
+        self, url: str = DEFAULT_TARGET_URL, username: str | None = None, password: str | None = None
     ) -> None:
         """Initialize ScrapydClient."""
         self.url = url
@@ -40,8 +40,10 @@ class ScrapydClient:
         )
 
     def schedule(
-        self, project: str, spider: str, args: list[tuple[str, str]] = []
+        self, project: str, spider: str, args: list[tuple[str, str]] | None = None
     ) -> str:
+        if args is None:
+            args = []
         return lib.schedule(
             url=self.url,
             project=project,

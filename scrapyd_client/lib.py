@@ -64,15 +64,14 @@ def get_jobs(url, project, username=None, password=None):
     :type pattern: str
     :rtype: A list of strings.
     """
-    response = get_request(
+    return get_request(
         f"{url}/listjobs.json",
         params={"project": project},
         auth=get_auth(url=url, username=username, password=password),
     )
-    return response
 
 
-def schedule(url, project, spider, args=[], username=None, password=None):
+def schedule(url, project, spider, args=None, username=None, password=None):
     """
     Schedule a spider to be executed.
 
@@ -91,9 +90,11 @@ def schedule(url, project, spider, args=[], username=None, password=None):
     :returns: The job id.
     :rtype: str
     """
+    if args is None:
+        args = []
     response = post_request(
         f"{url}/schedule.json",
-        data=args + [("project", project), ("spider", spider)],
+        data=[*args, ("project", project), ("spider", spider)],
         auth=get_auth(url=url, username=username, password=password),
     )
     return response["jobid"]

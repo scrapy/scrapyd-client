@@ -14,7 +14,7 @@ except FileNotFoundError:
 
 @pytest.mark.skipif(exists, reason="a .netrc file exists")
 @pytest.mark.parametrize(
-    "url,username,password,expected",
+    ("url", "username", "password", "expected"),
     [
         ("http://localhost:6800", None, None, None),
         (
