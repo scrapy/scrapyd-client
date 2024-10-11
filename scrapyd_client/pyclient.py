@@ -1,6 +1,5 @@
-from typing import Dict, List, Tuple
 
-import scrapyd_client.lib as lib
+from scrapyd_client import lib
 from scrapyd_client.utils import DEFAULT_TARGET_URL
 
 
@@ -15,7 +14,7 @@ class ScrapydClient:
         self.username = username
         self.password = password
 
-    def projects(self, pattern: str = "*") -> List[str]:
+    def projects(self, pattern: str = "*") -> list[str]:
         return lib.get_projects(
             url=self.url,
             pattern=pattern,
@@ -23,7 +22,7 @@ class ScrapydClient:
             password=self.password,
         )
 
-    def spiders(self, project: str, pattern: str = "*") -> List[str]:
+    def spiders(self, project: str, pattern: str = "*") -> list[str]:
         return lib.get_spiders(
             url=self.url,
             project=project,
@@ -32,7 +31,7 @@ class ScrapydClient:
             password=self.password,
         )
 
-    def jobs(self, project: str) -> Dict:
+    def jobs(self, project: str) -> dict:
         return lib.get_jobs(
             url=self.url,
             project=project,
@@ -41,7 +40,7 @@ class ScrapydClient:
         )
 
     def schedule(
-        self, project: str, spider: str, args: List[Tuple[str, str]] = []
+        self, project: str, spider: str, args: list[tuple[str, str]] = []
     ) -> str:
         return lib.schedule(
             url=self.url,

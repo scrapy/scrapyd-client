@@ -9,7 +9,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from scrapy.utils import conf
 
-with open(join(dirname(__file__), "VERSION"), "rt") as f:
+with open(join(dirname(__file__), "VERSION")) as f:
     VERSION = f.readline().strip()
 
 HEADERS = requests.utils.default_headers().copy()
@@ -67,7 +67,7 @@ def get_auth(url, username, password):
     try:
         username, _account, password = netrc.netrc().authenticators(urlparse(url).hostname)
         return HTTPBasicAuth(username=username, password=password)
-    except (netrc.NetrcParseError, IOError, TypeError):
+    except (OSError, netrc.NetrcParseError, TypeError):
         return None
 
 

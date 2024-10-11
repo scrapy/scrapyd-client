@@ -233,7 +233,7 @@ def _get_version(target, opts):
         process = subprocess.Popen(["hg", "branch"], stdout=subprocess.PIPE, universal_newlines=True)
         name = process.communicate()[0].strip("\n")
         return "%s-%s" % (descriptor, name)
-    elif version == "GIT":
+    if version == "GIT":
         process = subprocess.Popen(["git", "describe"], stdout=subprocess.PIPE, universal_newlines=True)
         descriptor = process.communicate()[0].strip("\n")
         if process.wait() != 0:
@@ -251,10 +251,9 @@ def _get_version(target, opts):
         )
         name = process.communicate()[0].strip("\n")
         return "%s-%s" % (descriptor, name)
-    elif version:
+    if version:
         return version
-    else:
-        return str(int(time.time()))
+    return str(int(time.time()))
 
 
 
@@ -305,7 +304,7 @@ class HTTPRedirectHandler(UrllibHTTPRedirectHandler):
                 origin_req_host=request.get_origin_req_host(),
                 unverifiable=True,
             )
-        elif code in (302, 303):
+        if code in (302, 303):
             newheaders = dict(
                 (header, value)
                 for header, value in request.headers.items()
@@ -317,8 +316,7 @@ class HTTPRedirectHandler(UrllibHTTPRedirectHandler):
                 origin_req_host=request.get_origin_req_host(),
                 unverifiable=True,
             )
-        else:
-            raise HTTPError(request.get_full_url(), code, msg, headers, fp)
+        raise HTTPError(request.get_full_url(), code, msg, headers, fp)
 
 
 if __name__ == "__main__":

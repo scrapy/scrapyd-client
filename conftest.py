@@ -1,5 +1,5 @@
 import pytest
-import scrapy.utils.conf as conf
+from scrapy.utils import conf
 
 
 @pytest.fixture(autouse=True)
