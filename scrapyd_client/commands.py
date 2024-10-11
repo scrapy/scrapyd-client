@@ -25,10 +25,10 @@ def projects(args):
 def schedule(args):
     """Schedule the specified spider(s)."""
     job_args = [(x[0], x[1]) for x in (y.split("=", 1) for y in args.arg)]
-    _projects = lib.get_projects(
+
+    for project in lib.get_projects(
         args.target, args.project, username=args.username, password=args.password
-    )
-    for project in _projects:
+    ):
         _spiders = lib.get_spiders(
             args.target,
             project,
@@ -50,10 +50,9 @@ def schedule(args):
 
 def spiders(args):
     """List all spiders for the given project(s)."""
-    _projects = lib.get_projects(
+    for project in lib.get_projects(
         args.target, args.project, username=args.username, password=args.password
-    )
-    for project in _projects:
+    ):
         project_spiders = lib.get_spiders(
             args.target, project, username=args.username, password=args.password
         )
@@ -62,6 +61,6 @@ def spiders(args):
             if project_spiders:
                 print(indent("\n".join(project_spiders), INDENT_PREFIX))
             else:
-                print(INDENT_PREFIX + "No spiders.")
+                print(f"{INDENT_PREFIX}No spiders.")
         elif project_spiders:
             print("\n".join(f"{project} {x}" for x in project_spiders))

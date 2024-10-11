@@ -188,7 +188,7 @@ def _build_egg_and_deploy_target(target, version, opts):
 
 
 def _log(message):
-    sys.stderr.write(message + os.linesep)
+    sys.stderr.write(f"{message}{os.linesep}")
 
 
 def _fail(message, code=1):

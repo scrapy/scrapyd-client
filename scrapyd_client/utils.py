@@ -30,13 +30,9 @@ class EnvInterpolation(BasicInterpolation):
 class ErrorResponse(Exception):
     """Raised when Scrapyd reports an error."""
 
-    pass
-
 
 class MalformedResponse(Exception):
     """Raised when the response can't be decoded."""
-
-    pass
 
 
 def _process_response(response):
@@ -48,13 +44,10 @@ def _process_response(response):
 
     status = response["status"]
     if status == "ok":
-        pass
-    elif status == "error":
+        return response
+    if status == "error":
         raise ErrorResponse(response["message"])
-    else:
-        raise RuntimeError(f"Unhandled response status: {status}")
-
-    return response
+    raise RuntimeError(f"Unhandled response status: {status}")
 
 
 def get_auth(url, username, password):
@@ -70,17 +63,14 @@ def get_auth(url, username, password):
     :returns: An HTTPBasicAuth object or None.
     :rtype: requests.auth.HTTPBasicAuth or None
     """
-    auth = None
     if username:
-        auth = HTTPBasicAuth(username=username, password=password)
-    else:  # try netrc
-        try:
-            host = urlparse(url).hostname
-            a = netrc.netrc().authenticators(host)
-            auth = HTTPBasicAuth(username=a[0], password=a[2])
-        except (netrc.NetrcParseError, IOError, TypeError):
-            pass
-    return auth
+        return HTTPBasicAuth(username=username, password=password)
+
+    try:
+        username, _account, password = netrc.netrc().authenticators(urlparse(url).hostname)
+        return HTTPBasicAuth(username=username, password=password)
+    except (netrc.NetrcParseError, IOError, TypeError):
+        return None
 
 
 def get_request(url, params={}, auth=None):
@@ -94,8 +84,7 @@ def get_request(url, params={}, auth=None):
     :returns: The processed response.
     :rtype: mapping
     """
-    response = requests.get(url, params=params, headers=HEADERS, auth=auth)
-    return _process_response(response)
+    return _process_response(requests.get(url, params=params, headers=HEADERS, auth=auth))
 
 
 def post_request(url, data, auth=None):
@@ -108,13 +97,11 @@ def post_request(url, data, auth=None):
     :returns: The processed response.
     :rtype: mapping
     """
-    response = requests.post(url, data=data, headers=HEADERS, auth=auth)
-    return _process_response(response)
+    return _process_response(requests.post(url, data=data, headers=HEADERS, auth=auth))
 
 
 def get_config(use_closest=True):
     """Get Scrapy config file as a ConfigParser."""
-    sources = conf.get_sources(use_closest)
     cfg = ConfigParser(interpolation=EnvInterpolation())
-    cfg.read(sources)
+    cfg.read(conf.get_sources(use_closest))
     return cfg

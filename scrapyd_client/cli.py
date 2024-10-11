@@ -117,7 +117,7 @@ def main():
     except MalformedResponse as e:
         text = str(e)
         if len(text) > 120:
-            text = text[:50] + " [...] " + text[-50:]
+            text = f"{text[:50]} [...] {text[-50:]}"
         print("Received a malformed response:")
         print(text)
         exit_code = 1

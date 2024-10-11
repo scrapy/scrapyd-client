@@ -19,7 +19,7 @@ def get_projects(url, pattern="*", username=None, password=None):
     :rtype: A list of strings.
     """
     response = get_request(
-        url + "/listprojects.json",
+        f"{url}/listprojects.json",
         auth=get_auth(url=url, username=username, password=password),
     )
     return fnmatch.filter(response["projects"], pattern)
@@ -43,7 +43,7 @@ def get_spiders(url, project, pattern="*", username=None, password=None):
     :rtype: A list of strings.
     """
     response = get_request(
-        url + "/listspiders.json",
+        f"{url}/listspiders.json",
         params={"project": project},
         auth=get_auth(url=url, username=username, password=password),
     )
@@ -65,7 +65,7 @@ def get_jobs(url, project, username=None, password=None):
     :rtype: A list of strings.
     """
     response = get_request(
-        url + "/listjobs.json",
+        f"{url}/listjobs.json",
         params={"project": project},
         auth=get_auth(url=url, username=username, password=password),
     )
@@ -91,11 +91,9 @@ def schedule(url, project, spider, args=[], username=None, password=None):
     :returns: The job id.
     :rtype: str
     """
-    data = args.copy()
-    data += [("project", project), ("spider", spider)]
     response = post_request(
-        url + "/schedule.json",
-        data=data,
+        f"{url}/schedule.json",
+        data=args + [("project", project), ("spider", spider)],
         auth=get_auth(url=url, username=username, password=password),
     )
     return response["jobid"]
