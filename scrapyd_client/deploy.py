@@ -4,11 +4,11 @@ import glob
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import time
 from argparse import ArgumentParser
-from subprocess import PIPE, Popen, check_call
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin
 from urllib.request import HTTPRedirectHandler as UrllibHTTPRedirectHandler
@@ -190,27 +190,27 @@ def _url(target, action):
 def _get_version(target, opts):
     version = opts.version or target.get("version")
     if version == "HG":
-        p = Popen(
-            ["hg", "tip", "--template", "{rev}"], stdout=PIPE, universal_newlines=True
+        p = subprocess.Popen(
+            ["hg", "tip", "--template", "{rev}"], stdout=subprocess.PIPE, universal_newlines=True
         )
         d = "r%s" % p.communicate()[0]
-        p = Popen(["hg", "branch"], stdout=PIPE, universal_newlines=True)
+        p = subprocess.Popen(["hg", "branch"], stdout=subprocess.PIPE, universal_newlines=True)
         b = p.communicate()[0].strip("\n")
         return "%s-%s" % (d, b)
     elif version == "GIT":
-        p = Popen(["git", "describe"], stdout=PIPE, universal_newlines=True)
+        p = subprocess.Popen(["git", "describe"], stdout=subprocess.PIPE, universal_newlines=True)
         d = p.communicate()[0].strip("\n")
         if p.wait() != 0:
-            p = Popen(
+            p = subprocess.Popen(
                 ["git", "rev-list", "--count", "HEAD"],
-                stdout=PIPE,
+                stdout=subprocess.PIPE,
                 universal_newlines=True,
             )
             d = "r%s" % p.communicate()[0].strip("\n")
 
-        p = Popen(
+        p = subprocess.Popen(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-            stdout=PIPE,
+            stdout=subprocess.PIPE,
             universal_newlines=True,
         )
         b = p.communicate()[0].strip("\n")
@@ -295,7 +295,8 @@ def _build_egg(opts):
     else:
         command = "bdist_egg"
 
-    check_call([sys.executable, "setup.py", "clean", "-a", command, "-d", d], stdout=o, stderr=e)
+    subprocess.check_call([sys.executable, "setup.py", "clean", "-a", command, "-d", d], stdout=o, stderr=e)
+
     o.close()
     e.close()
 
