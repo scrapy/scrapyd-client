@@ -53,7 +53,6 @@ class ScrapydClient:
 
 
 def _process_response(response):
-    """Process the response object into a dictionary."""
     try:
         response = response.json()
     except json.decoder.JSONDecodeError as e:

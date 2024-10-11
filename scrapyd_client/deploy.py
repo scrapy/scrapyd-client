@@ -79,7 +79,11 @@ def main():
             _, tmpdir = _build_egg_and_deploy_target(target, version, opts)
             _remove_tmpdir(tmpdir, opts)
     else:  # buld egg and deploy
-        target = _get_target(opts.target)
+        try:
+            target = _get_targets()[opts.target]
+        except KeyError:
+            raise _fail(f"Unknown target: {opts.target}") from None
+
         version = _get_version(target, opts)
         exitcode, tmpdir = _build_egg_and_deploy_target(target, version, opts)
         _remove_tmpdir(tmpdir, opts)
@@ -114,13 +118,17 @@ def _build_egg_and_deploy_target(target, version, opts):
     _log(f'Deploying to project "{project}" in {url}')
 
     # Upload egg.
+    kwargs = {}
+    if auth := get_auth(url=target["url"], username=target.get("username"), password=target.get("password", "")):
+        kwargs["auth"] = HTTPBasicAuth(auth.username, auth.password)
+
     try:
         with open(eggpath, "rb") as f:
             response = requests.post(
                 _url(target, "addversion.json"),
                 data={"project": project, "version": version},
                 files=[("egg", ("project.egg", f))],
-                **_requests_auth(target),
+                **kwargs,
             )
         response.raise_for_status()
         _log(f"Server response ({response.status_code}):")
@@ -168,13 +176,6 @@ def _get_targets():
     return targets
 
 
-def _get_target(name):
-    try:
-        return _get_targets()[name]
-    except KeyError:
-        raise _fail(f"Unknown target: {name}") from None
-
-
 def _url(target, action):
     if "url" in target:
         return urljoin(target["url"], action)
@@ -212,12 +213,6 @@ def _get_version(target, opts):
     if version:
         return version
     return str(int(time.time()))
-
-
-def _requests_auth(target):
-    if auth := get_auth(url=target["url"], username=target.get("username"), password=target.get("password", "")):
-        return {"auth": HTTPBasicAuth(auth.username, auth.password)}
-    return {}
 
 
 def _build_egg(opts):
