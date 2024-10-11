@@ -16,10 +16,9 @@ def deploy(args):
 
 def projects(args):
     """List all projects deployed on a Scrapyd instance."""
-    _projects = lib.get_projects(
+    if _projects := lib.get_projects(
         args.target, username=args.username, password=args.password
-    )
-    if _projects:
+    ):
         print("\n".join(_projects))
 
 

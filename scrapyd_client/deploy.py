@@ -264,8 +264,7 @@ def _add_auth_header(request, target):
         target.get("username"),
         target.get("password", ""),
     )
-    auth = get_auth(url=url, username=username, password=password)
-    if auth:
+    if auth := get_auth(url=url, username=username, password=password):
         request.add_header(
             "Authorization", basic_auth_header(auth.username, auth.password)
         )
