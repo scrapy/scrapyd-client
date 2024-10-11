@@ -1,7 +1,6 @@
 include *.py
 include *.rst
 include LICENSE
-include tox.ini
 recursive-include tests *.py
 exclude .git-blame-ignore-revs
 exclude .pre-commit-config.yaml

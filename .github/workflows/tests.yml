@@ -1,62 +1,32 @@
 name: Tests
 on: [push, pull_request]
-
 jobs:
   tests:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: [3.9, "3.10", "3.11", "3.12", pypy-3.10]
-        include:
-        - python-version: 3.9
-          env:
-            TOXENV: py
-        - python-version: "3.10"
-          env:
-            TOXENV: py
-        - python-version: "3.11"
-          env:
-            TOXENV: py
-        - python-version: "3.12"
-          env:
-            TOXENV: py
-        - python-version: pypy-3.10
-          env:
-            TOXENV: pypy
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        python-version: [3.9, '3.10', '3.11', '3.12', pypy-3.10]
         # It is difficult to install libxml2 and libxslt development packages on Windows.
         # https://www.lfd.uci.edu/~gohlke/pythonlibs/ distributes a wheel, but the URL changes.
         exclude:
           - os: windows-latest
             python-version: pypy-3.10
-
     steps:
-    - uses: actions/checkout@v3
-
-    - name: Install system libraries
-      if: contains(matrix.os, 'ubuntu') && contains(matrix.python-version, 'pypy')
-      run: |
-        sudo apt-get update
-        sudo apt-get install libxml2-dev libxslt-dev
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Run tests
-      env: ${{ matrix.env }}
-      run: |
-        pip install -U tox
-        tox
-
-    - name: Upload coverage report
-      if: matrix.os == 'ubuntu-latest'
-      run: bash <(curl -s https://codecov.io/bash)
-
-    - name: Check MANIFEST.in
-      run: |
-        pip install -U check-manifest setuptools
-        check-manifest
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - if: matrix.os == 'ubuntu-latest' && matrix.python-version == 'pypy-3.10'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libxml2-dev libxslt-dev
+      - run: pip install .[test]
+      - run: coverage run --source=scrapyd_client -m pytest
+      - if: matrix.os == 'ubuntu-latest'
+        run: bash <(curl -s https://codecov.io/bash)
+      - run: pip install -U check-manifest setuptools
+      - run: check-manifest

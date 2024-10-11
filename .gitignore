@@ -3,7 +3,6 @@
 dist
 build
 htmlcov
-.tox/
 .cache/
 .coverage
 venv/
