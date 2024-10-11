@@ -14,10 +14,10 @@ Changed
 ^^^^^^^
 
 - **BREAKING CHANGE:** Move exceptions from ``scrapyd_client.utils`` to ``scrapyd_client.exceptions``.
-- **BREAKING CHANGE:** Move ``HEADERS`` from ``scrapyd_client.utils`` to ``scrapyd_client.lib``.
+- **BREAKING CHANGE:** Move ``HEADERS`` from ``scrapyd_client.utils`` to ``scrapyd_client.pyclient``.
 - **BREAKING CHANGE:** Merge ``scrapyd_client.commands`` and ``scrapyd_client.cli`` into ``scrapyd_client.__main__``.
 - The ``scrapyd-client schedule`` subcommand accepts multiple ``--arg setting=...`` arguments. (@mxdev88)
-- The ``scrapyd_client.lib.schedule`` and ``scrapyd_client.ScrapyClient.schedule`` methods accept ``args`` as a list, instead of as a dict.
+- The ``scrapyd_client.ScrapyClient.schedule`` methods accept ``args`` as a list, instead of as a dict.
 - The ``scrapyd-deploy --debug`` option prints the subprocess' standard output and standard error, instead of writing to ``stdout`` and ``stderr`` files.
 
 Fixed
@@ -29,8 +29,9 @@ Fixed
 Removed
 ^^^^^^^
 
-- **BREAKING CHANGE:** Remove ``scrapyd-deploy --list-projects``, in favor of ``scrapyd-client projects``.
-- **BREAKING CHANGE:** Remove ``get_request`` and ``post_request`` from ``scrapyd_client.utils``.
+- **BREAKING CHANGE:** Remove the ``scrapyd-deploy --list-projects`` option, in favor of ``scrapyd-client projects``.
+- **BREAKING CHANGE:** Remove the ``get_request`` and ``post_request`` functions from ``scrapyd_client.utils``.
+- **BREAKING CHANGE:** Remove the ``scrapyd_client.lib`` module, in favor of ``scrapyd_client.ScrapydClient``.
 - Remove ``urllib3`` and ``w3lib`` requirements.
 - Drop support for Python 3.7, 3.8.
 

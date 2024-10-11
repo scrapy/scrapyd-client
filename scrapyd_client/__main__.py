@@ -6,12 +6,15 @@ from traceback import print_exc
 import requests
 
 import scrapyd_client.deploy
-from scrapyd_client import lib
 from scrapyd_client.exceptions import ErrorResponse, MalformedResponse
+from scrapyd_client.pyclient import ScrapydClient
 from scrapyd_client.utils import DEFAULT_TARGET_URL, get_config
 
-INDENT_PREFIX = "  "
 ISSUE_TRACKER_URL = "https://github.com/scrapy/scrapyd-client/issues"
+
+
+def _get_client(args):
+    return ScrapydClient(args.target, username=args.username, password=args.password)
 
 
 def deploy(args):  # noqa: ARG001
@@ -22,46 +25,37 @@ def deploy(args):  # noqa: ARG001
 
 def projects(args):
     """List all projects deployed on a Scrapyd instance."""
-    if _projects := lib.get_projects(args.target, username=args.username, password=args.password):
-        print("\n".join(_projects))
+    client = _get_client(args)
+
+    if projects := client.projects():
+        print("\n".join(projects))
 
 
 def schedule(args):
     """Schedule the specified spider(s)."""
-    job_args = [(x[0], x[1]) for x in (y.split("=", 1) for y in args.arg)]
+    client = _get_client(args)
+    job_args = [(key, value) for job_arg in args.arg for key, value in job_arg.split("=", 1)]
 
-    for project in lib.get_projects(args.target, args.project, username=args.username, password=args.password):
-        _spiders = lib.get_spiders(
-            args.target,
-            project,
-            args.spider,
-            username=args.username,
-            password=args.password,
-        )
-        for spider in _spiders:
-            job_id = lib.schedule(
-                args.target,
-                project,
-                spider,
-                job_args,
-                username=args.username,
-                password=args.password,
-            )
+    for project in client.projects(args.project):
+        for spider in client.spiders(project, args.spider):
+            job_id = client.schedule(project, spider, job_args)
             print(f"{project} / {spider} => {job_id}")
 
 
 def spiders(args):
     """List all spiders for the given project(s)."""
-    for project in lib.get_projects(args.target, args.project, username=args.username, password=args.password):
-        project_spiders = lib.get_spiders(args.target, project, username=args.username, password=args.password)
+    client = _get_client(args)
+
+    for project in client.projects(args.project):
+        spiders = client.spiders(project)
         if not args.verbose:
             print(f"{project}:")
-            if project_spiders:
-                print(indent("\n".join(project_spiders), INDENT_PREFIX))
+            if spiders:
+                print(indent("\n".join(spiders), "  "))
             else:
-                print(f"{INDENT_PREFIX}No spiders.")
-        elif project_spiders:
-            print("\n".join(f"{project} {x}" for x in project_spiders))
+                print("  No spiders.")
+        elif spiders:
+            print("\n".join(f"{project} {spider}" for spider in spiders))
 
 
 def parse_cli_args(args):

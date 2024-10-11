@@ -1,7 +1,15 @@
 from __future__ import annotations
 
-from scrapyd_client import lib
-from scrapyd_client.utils import DEFAULT_TARGET_URL
+import fnmatch
+import json
+
+import requests
+
+from scrapyd_client.exceptions import ErrorResponse, MalformedResponse
+from scrapyd_client.utils import DEFAULT_TARGET_URL, get_auth
+
+HEADERS = requests.utils.default_headers().copy()
+HEADERS["User-Agent"] = "Scrapyd-client/2.0.0"
 
 
 class ScrapydClient:
@@ -12,42 +20,48 @@ class ScrapydClient:
     ) -> None:
         """Initialize ScrapydClient."""
         self.url = url
-        self.username = username
-        self.password = password
+        self.auth = get_auth(url=self.url, username=username, password=password)
 
     def projects(self, pattern: str = "*") -> list[str]:
-        return lib.get_projects(
-            url=self.url,
-            pattern=pattern,
-            username=self.username,
-            password=self.password,
-        )
+        response = self._get("listprojects")
+        return fnmatch.filter(response["projects"], pattern)
 
     def spiders(self, project: str, pattern: str = "*") -> list[str]:
-        return lib.get_spiders(
-            url=self.url,
-            project=project,
-            pattern=pattern,
-            username=self.username,
-            password=self.password,
-        )
+        response = self._get("listspiders", params={"project": project})
+        return fnmatch.filter(response["spiders"], pattern)
 
     def jobs(self, project: str) -> dict:
-        return lib.get_jobs(
-            url=self.url,
-            project=project,
-            username=self.username,
-            password=self.password,
-        )
+        return self._get("listjobs", params={"project": project})
 
     def schedule(self, project: str, spider: str, args: list[tuple[str, str]] | None = None) -> str:
         if args is None:
             args = []
-        return lib.schedule(
-            url=self.url,
-            project=project,
-            spider=spider,
-            args=args,
-            username=self.username,
-            password=self.password,
+        response = self._post("schedule", data=[*args, ("project", project), ("spider", spider)])
+        return response["jobid"]
+
+    def _get(self, basename: str, params=None):
+        if params is None:
+            params = {}
+        return _process_response(
+            requests.get(f"{self.url}/{basename}.json", params=params, headers=HEADERS, auth=self.auth)
         )
+
+    def _post(self, basename: str, data):
+        return _process_response(
+            requests.post(f"{self.url}/{basename}.json", data=data, headers=HEADERS, auth=self.auth)
+        )
+
+
+def _process_response(response):
+    """Process the response object into a dictionary."""
+    try:
+        response = response.json()
+    except json.decoder.JSONDecodeError as e:
+        raise MalformedResponse(response.text) from e
+
+    status = response["status"]
+    if status == "ok":
+        return response
+    if status == "error":
+        raise ErrorResponse(response["message"])
+    raise RuntimeError(f"Unhandled response status: {status}")
