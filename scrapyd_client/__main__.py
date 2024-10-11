@@ -9,13 +9,15 @@ from scrapy.utils.project import inside_project
 import scrapyd_client.deploy
 from scrapyd_client.exceptions import ErrorResponse, MalformedResponse
 from scrapyd_client.pyclient import ScrapydClient
-from scrapyd_client.utils import DEFAULT_TARGET_URL, _get_targets, get_config
+from scrapyd_client.utils import _get_targets, get_config
 
 ISSUE_TRACKER_URL = "https://github.com/scrapy/scrapyd-client/issues"
 
 
 def _get_client(args):
-    return ScrapydClient(args.target, username=args.username, password=args.password)
+    target = _get_targets()[args.target]
+
+    return ScrapydClient(args.target, target.get("username"), password=target.get("password", ""))
 
 
 def deploy(args):  # noqa: ARG001
@@ -80,25 +82,6 @@ def parse_cli_args(args):
     mainparser = ArgumentParser(description=description)
     subparsers = mainparser.add_subparsers()
 
-    mainparser.add_argument(
-        "-t",
-        "--target",
-        default=cfg.get("deploy", "url", fallback=DEFAULT_TARGET_URL).rstrip("/"),
-        help="Specifies the Scrapyd's API base URL.",
-    )
-    mainparser.add_argument(
-        "-u",
-        "--username",
-        default=cfg.get("deploy", "username", fallback=None),
-        help="Specifies the username to connect to the Scrapyd target.",
-    )
-    mainparser.add_argument(
-        "-p",
-        "--password",
-        default=cfg.get("deploy", "password", fallback=None),
-        help="Specifies the password to connect to the Scrapyd target.",
-    )
-
     parser = subparsers.add_parser("deploy", description=deploy.__doc__)
     parser.set_defaults(action=deploy)
 
@@ -107,9 +90,11 @@ def parse_cli_args(args):
 
     parser = subparsers.add_parser("projects", description=projects.__doc__)
     parser.set_defaults(action=projects)
+    parser.add_argument("-t", "--target", default="default", help="Specifies the target Scrapyd server by name.")
 
     parser = subparsers.add_parser("schedule", description=schedule.__doc__)
     parser.set_defaults(action=schedule)
+    parser.add_argument("-t", "--target", default="default", help="Specifies the target Scrapyd server by name.")
     parser.add_argument("-p", "--project", **project_kwargs)
     parser.add_argument(
         "spider",
@@ -125,6 +110,7 @@ def parse_cli_args(args):
 
     parser = subparsers.add_parser("spiders", description=spiders.__doc__)
     parser.set_defaults(action=spiders)
+    parser.add_argument("-t", "--target", default="default", help="Specifies the target Scrapyd server by name.")
     parser.add_argument("-p", "--project", **project_kwargs)
     parser.add_argument(
         "-v",

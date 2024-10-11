@@ -1,7 +1,7 @@
 from itertools import chain
 
 
-def test_schedule(mocker, script_runner, project):
+def test_schedule(mocker, script_runner, conf_default_target):
     get_responses = [
         {"projects": ["foo"]},
         {"spiders": ["bar"]},

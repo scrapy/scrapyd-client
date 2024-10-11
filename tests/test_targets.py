@@ -19,8 +19,7 @@ def test_too_many_arguments(script_runner, project):
         ret.stderr,
         dedent(
             """\
-            usage: scrapyd-client [-h] [-t TARGET] [-u USERNAME] [-p PASSWORD]
-                                  {deploy,targets,projects,schedule,spiders} ...
+            usage: scrapyd-client [-h] {deploy,targets,projects,schedule,spiders} ...
             scrapyd-client: error: unrecognized arguments: extra
             """
         ),

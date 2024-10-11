@@ -6,8 +6,9 @@ import json
 import requests
 
 from scrapyd_client.exceptions import ErrorResponse, MalformedResponse
-from scrapyd_client.utils import DEFAULT_TARGET_URL, get_auth
+from scrapyd_client.utils import get_auth
 
+DEFAULT_TARGET_URL = "http://localhost:6800"
 HEADERS = requests.utils.default_headers().copy()
 HEADERS["User-Agent"] = "Scrapyd-client/2.0.0"
 

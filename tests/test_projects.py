@@ -1,4 +1,4 @@
-def test_projects(mocker, script_runner, project):
+def test_projects(mocker, script_runner, conf_default_target):
     projects = ["foo", "bar"]
     mock_response = mocker.Mock()
     mock_response.json.return_value = {"projects": ["foo", "bar"], "status": "ok"}

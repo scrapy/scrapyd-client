@@ -14,13 +14,19 @@ Added
 Changed
 ^^^^^^^
 
-- **BREAKING CHANGE:** Move exceptions from ``scrapyd_client.utils`` to ``scrapyd_client.exceptions``.
-- **BREAKING CHANGE:** Move ``HEADERS`` from ``scrapyd_client.utils`` to ``scrapyd_client.pyclient``.
-- **BREAKING CHANGE:** Merge ``scrapyd_client.commands`` and ``scrapyd_client.cli`` into ``scrapyd_client.__main__``.
+Changes to commands:
+
+- **BREAKING CHANGE:** ``scrapyd-client`` subcommands accept the ``--target`` (``-t``) option, instead of the ``scrapyd-client`` command itself. The target is the name of a target in the ``scrapy.cfg`` file, like ``scrapyd-deploy``, instead of a URL.
 - **BREAKING CHANGE:** ``scrapyd-client`` raises an error if no Scrapy project is found, like ``scrapyd-deploy``, instead of assuming a target at ``http://localhost:6800``.
 - The ``scrapyd-client schedule`` subcommand accepts multiple ``--arg setting=...`` arguments. (@mxdev88)
 - The ``scrapyd_client.ScrapyClient.schedule`` methods accept ``args`` as a list, instead of as a dict.
 - The ``scrapyd-deploy --debug`` option prints the subprocess' standard output and standard error, instead of writing to ``stdout`` and ``stderr`` files.
+
+Changes to modules:
+
+- **BREAKING CHANGE:** Move exceptions from ``scrapyd_client.utils`` to ``scrapyd_client.exceptions``.
+- **BREAKING CHANGE:** Move ``DEFAULT_TARGET_URL`` and ``HEADERS`` from ``scrapyd_client.utils`` to ``scrapyd_client.pyclient``.
+- **BREAKING CHANGE:** Merge ``scrapyd_client.commands`` and ``scrapyd_client.cli`` into ``scrapyd_client.__main__``.
 
 Fixed
 ^^^^^
@@ -31,6 +37,7 @@ Fixed
 Removed
 ^^^^^^^
 
+- **BREAKING CHANGE:** Remove the ``scrapyd-client --username`` (``-u``) and ``--password`` (``-p``) options, in favor of using the ``scrapy.cfg`` file.
 - **BREAKING CHANGE:** Remove the ``scrapyd-deploy --list-targets`` (``-l``) option, in favor of ``scrapyd-client targets``.
 - **BREAKING CHANGE:** Remove the ``scrapyd-deploy --list-projects`` (``-L``) option, in favor of ``scrapyd-client projects``.
 - **BREAKING CHANGE:** Remove the ``get_request`` and ``post_request`` functions from ``scrapyd_client.utils``.

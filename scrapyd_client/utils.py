@@ -8,8 +8,6 @@ from urllib.parse import urlparse
 from requests.auth import HTTPBasicAuth
 from scrapy.utils import conf
 
-DEFAULT_TARGET_URL = "http://localhost:6800"
-
 
 class EnvInterpolation(BasicInterpolation):
     """Interpolation which expands environment variables in values."""
