@@ -26,10 +26,6 @@ def deploy(args):  # noqa: ARG001
 
 def targets(args):  # noqa: ARG001
     """List all targets."""
-    if not inside_project():
-        print("Error: no Scrapy project found in this location", file=sys.stderr)
-        sys.exit(1)
-
     for name, target in _get_targets().items():
         print("%-20s %s" % (name, target["url"]))
 
@@ -154,6 +150,10 @@ def parse_cli_args(args):
 
 
 def main():
+    if not inside_project():
+        print("Error: no Scrapy project found in this location", file=sys.stderr)
+        sys.exit(1)
+
     max_response_length = 120
     try:
         args = parse_cli_args(sys.argv[1:])

@@ -8,7 +8,7 @@ for response in responses:
     response["status"] = "ok"
 
 
-def test_spiders(mocker, script_runner):
+def test_spiders(mocker, script_runner, project):
     mock_response = mocker.Mock()
     mock_response.json.side_effect = responses
     mock_get = mocker.patch("scrapyd_client.pyclient.requests.get", autospec=True)
@@ -33,7 +33,7 @@ peng:
     )
 
 
-def test_spiders_verbose(mocker, script_runner):
+def test_spiders_verbose(mocker, script_runner, project):
     mock_response = mocker.Mock()
     mock_response.json.side_effect = responses
     mock_get = mocker.patch("scrapyd_client.pyclient.requests.get", autospec=True)
