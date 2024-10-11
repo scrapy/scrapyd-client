@@ -16,7 +16,7 @@ Changed
 
 Changes to commands:
 
-- **BREAKING CHANGE:** ``scrapyd-client`` subcommands accept the ``--target`` (``-t``) option, instead of the ``scrapyd-client`` command itself. The target is the name of a target in the ``scrapy.cfg`` file, like ``scrapyd-deploy``, instead of a URL.
+- **BREAKING CHANGE:** ``scrapyd-client`` subcommands accept the ``--target`` (``-t``) option, not the ``scrapyd-client`` command. The target is the name of a target in the ``scrapy.cfg`` file, like ``scrapyd-deploy``, instead of a URL.
 - **BREAKING CHANGE:** ``scrapyd-client`` raises an error if no Scrapy project is found, like ``scrapyd-deploy``, instead of assuming a target at ``http://localhost:6800``.
 - The ``scrapyd-client schedule`` subcommand accepts multiple ``--arg setting=...`` arguments. (@mxdev88)
 - The ``scrapyd_client.ScrapyClient.schedule`` methods accept ``args`` as a list, instead of as a dict.
