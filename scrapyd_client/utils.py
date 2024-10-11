@@ -2,18 +2,14 @@ import netrc
 import os
 from configparser import BasicInterpolation, ConfigParser
 from json.decoder import JSONDecodeError
-from os.path import dirname, join
 from urllib.parse import urlparse
 
 import requests
 from requests.auth import HTTPBasicAuth
 from scrapy.utils import conf
 
-with open(join(dirname(__file__), "VERSION")) as f:
-    VERSION = f.readline().strip()
-
 HEADERS = requests.utils.default_headers().copy()
-HEADERS["User-Agent"] = f"Scrapyd-client/{VERSION}"
+HEADERS["User-Agent"] = "Scrapyd-client/1.2.3"
 DEFAULT_TARGET_URL = "http://localhost:6800"
 
 

@@ -1,9 +1,7 @@
 include *.py
 include *.rst
 include LICENSE
-include scrapyd_client/VERSION
 include tox.ini
 recursive-include tests *.py
-exclude .bumpversion.cfg
 exclude .git-blame-ignore-revs
 exclude .pre-commit-config.yaml
