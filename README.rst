@@ -8,8 +8,8 @@ Scrapyd-client is a client for Scrapyd_. It provides:
 
 Command line tools:
 
--  `scrapyd-deploy`_, to deploy your project to a Scrapyd server
--  `scrapyd-client`_, to interact with your project once deployed
+-  ``scrapyd-deploy``, to deploy your project to a Scrapyd server
+-  ``scrapyd-client``, to interact with your project once deployed
 
 Python client:
 
