@@ -1,10 +1,8 @@
-import errno
 import netrc
 import os
 from configparser import BasicInterpolation, ConfigParser
 from json.decoder import JSONDecodeError
 from os.path import dirname, join
-from textwrap import indent
 from urllib.parse import urlparse
 
 import requests

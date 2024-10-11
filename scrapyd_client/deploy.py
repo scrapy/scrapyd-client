@@ -288,7 +288,7 @@ def _build_egg(opts):
         command = "bdist_egg"
 
     kwargs = {} if opts.debug else {"stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL}
-    process = subprocess.run([sys.executable, "setup.py", "clean", "-a", command, "-d", tmpdir], check=True, **kwargs)
+    subprocess.run([sys.executable, "setup.py", "clean", "-a", command, "-d", tmpdir], check=True, **kwargs)
 
     eggpath = glob.glob(os.path.join(tmpdir, "*.egg"))[0]
     return eggpath, tmpdir

@@ -1,7 +1,7 @@
 import sys
 
 from scrapyd_client import lib
-from scrapyd_client.utils import indent
+from textwrap import indent
 
 INDENT_PREFIX = "  "
 
