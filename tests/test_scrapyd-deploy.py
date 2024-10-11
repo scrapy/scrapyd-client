@@ -46,7 +46,7 @@ def project(tmpdir, script_runner):
 
     p = tmpdir.mkdir("myhome")
     p.chdir()
-    ret = script_runner.run("scrapy", "startproject", "scrapyproj")
+    ret = script_runner.run(["scrapy", "startproject", "scrapyproj"])
 
     assert "New Scrapy project 'scrapyproj'" in ret.stdout
     assert ret.stderr == ""
@@ -150,7 +150,7 @@ def assertLines(actual, expected):
 
 @pytest.mark.parametrize("args", [[], ["-l"], ["-L", "default"]])
 def test_not_in_project(args, script_runner):
-    ret = script_runner.run("scrapyd-deploy", *args)
+    ret = script_runner.run(["scrapyd-deploy", *args])
 
     assert ret.stdout == ""
     assertLines(ret.stderr, "Error: no Scrapy project found in this location")
@@ -159,7 +159,7 @@ def test_not_in_project(args, script_runner):
 
 @pytest.mark.parametrize("args", [[], ["-l"], ["-L", "default"]])
 def test_too_many_arguments(args, script_runner, project):
-    ret = script_runner.run("scrapyd-deploy", "mytarget", "extra")
+    ret = script_runner.run(["scrapyd-deploy", "mytarget", "extra"])
 
     assert ret.stdout == ""
     assertLines(
@@ -178,7 +178,7 @@ def test_too_many_arguments(args, script_runner, project):
 
 
 def test_list_targets_missing_url(script_runner, conf_no_url):
-    ret = script_runner.run("scrapyd-deploy", "mytarget")
+    ret = script_runner.run(["scrapyd-deploy", "mytarget"])
 
     assert ret.stdout == ""
     assertLines(ret.stderr, [r"Packing version \d+", "Error: Missing url for project"])
@@ -186,7 +186,7 @@ def test_list_targets_missing_url(script_runner, conf_no_url):
 
 
 def test_list_targets_with_default(script_runner, conf_mixed_targets):
-    ret = script_runner.run("scrapyd-deploy", "-l")
+    ret = script_runner.run(["scrapyd-deploy", "-l"])
 
     assertLines(
         ret.stdout,
@@ -202,7 +202,7 @@ def test_list_targets_with_default(script_runner, conf_mixed_targets):
 
 
 def test_list_targets_without_default(script_runner, conf_named_targets):
-    ret = script_runner.run("scrapyd-deploy", "-l")
+    ret = script_runner.run(["scrapyd-deploy", "-l"])
 
     assertLines(
         ret.stdout,
@@ -218,7 +218,7 @@ def test_list_targets_without_default(script_runner, conf_named_targets):
 
 
 def test_unknown_target_implicit(script_runner, project):
-    ret = script_runner.run("scrapyd-deploy")
+    ret = script_runner.run(["scrapyd-deploy"])
 
     assert ret.stdout == ""
     assertLines(ret.stderr, "Unknown target: default")
@@ -226,7 +226,7 @@ def test_unknown_target_implicit(script_runner, project):
 
 
 def test_unknown_target_explicit(script_runner, project):
-    ret = script_runner.run("scrapyd-deploy", "nonexistent")
+    ret = script_runner.run(["scrapyd-deploy", "nonexistent"])
 
     assert ret.stdout == ""
     assertLines(ret.stderr, "Unknown target: nonexistent")
@@ -236,7 +236,7 @@ def test_unknown_target_explicit(script_runner, project):
 def test_empty_section_implicit_target(
     script_runner, conf_empty_section_implicit_target
 ):
-    ret = script_runner.run("scrapyd-deploy")
+    ret = script_runner.run(["scrapyd-deploy"])
 
     assert ret.stdout == ""
     assertLines(ret.stderr, "Unknown target: default")
@@ -246,7 +246,7 @@ def test_empty_section_implicit_target(
 def test_empty_section_explicit_target(
     script_runner, conf_empty_section_explicit_target
 ):
-    ret = script_runner.run("scrapyd-deploy", "mytarget")
+    ret = script_runner.run(["scrapyd-deploy", "mytarget"])
 
     assert ret.stdout == ""
     assertLines(ret.stderr, "Error: Missing project")
@@ -254,7 +254,7 @@ def test_empty_section_explicit_target(
 
 
 def test_deploy_missing_project(script_runner, conf_no_project):
-    ret = script_runner.run("scrapyd-deploy")
+    ret = script_runner.run(["scrapyd-deploy"])
 
     assert ret.stdout == ""
     assertLines(ret.stderr, "Error: Missing project")
@@ -262,7 +262,7 @@ def test_deploy_missing_project(script_runner, conf_no_project):
 
 
 def test_deploy_missing_url(script_runner, conf_no_url):
-    ret = script_runner.run("scrapyd-deploy", "mytarget")
+    ret = script_runner.run(["scrapyd-deploy", "mytarget"])
 
     assert ret.stdout == ""
     assertLines(ret.stderr, [r"Packing version \d+", "Error: Missing url for project"])
@@ -270,7 +270,7 @@ def test_deploy_missing_url(script_runner, conf_no_url):
 
 
 def test_build_egg(script_runner, project):
-    ret = script_runner.run("scrapyd-deploy", "--build-egg", "myegg.egg")
+    ret = script_runner.run(["scrapyd-deploy", "--build-egg", "myegg.egg"])
 
     assert ret.stdout == ""
     assertLines(ret.stderr, "Writing egg to myegg.egg")
@@ -279,7 +279,7 @@ def test_build_egg(script_runner, project):
 
 def test_build_egg_inc_dependencies_no_dep(script_runner, project):
     ret = script_runner.run(
-        "scrapyd-deploy", "--include-dependencies", "--build-egg", "myegg-deps.egg"
+        ["scrapyd-deploy", "--include-dependencies", "--build-egg", "myegg-deps.egg"]
     )
 
     assert ret.stdout == ""
@@ -297,7 +297,7 @@ def test_build_egg_inc_dependencies_no_dep(script_runner, project):
 
 def test_build_egg_inc_dependencies_with_dep(script_runner, project_with_dependencies):
     ret = script_runner.run(
-        "scrapyd-deploy", "--include-dependencies", "--build-egg", "myegg-deps.egg"
+        ["scrapyd-deploy", "--include-dependencies", "--build-egg", "myegg-deps.egg"]
     )
 
     assert ret.stdout == ""
@@ -319,7 +319,7 @@ def test_deploy_success(script_runner, conf_default_target):
         mocked.return_value.code = 200
         mocked.return_value.read.side_effect = lambda: b'{"status": "ok"}'
 
-        ret = script_runner.run("scrapyd-deploy")
+        ret = script_runner.run(["scrapyd-deploy"])
 
         assertLines(ret.stdout, '{"status": "ok"}')
         assertLines(
@@ -355,7 +355,7 @@ def test_deploy_httperror(content, expected, script_runner, conf_default_target)
             fp=BytesIO(content),
         )
 
-        ret = script_runner.run("scrapyd-deploy")
+        ret = script_runner.run(["scrapyd-deploy"])
 
         assertLines(ret.stdout, f"{expected}")
         assertLines(
@@ -374,7 +374,7 @@ def test_deploy_urlerror(script_runner, conf_default_target):
         # https://scrapyd.readthedocs.io/en/stable/api.html#addversion-json
         mocked.side_effect = URLError(reason="content")
 
-        ret = script_runner.run("scrapyd-deploy")
+        ret = script_runner.run(["scrapyd-deploy"])
 
         assert ret.stdout == ""
         assertLines(
