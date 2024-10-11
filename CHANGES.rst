@@ -8,13 +8,14 @@ Added
 ^^^^^
 
 - Add support for Python 3.12.
+- ``scrapyd-client`` can be called as ``python -m scrapyd_client``.
 
 Changed
 ^^^^^^^
 
 - **BREAKING CHANGE:** Move exceptions from ``scrapyd_client.utils`` to ``scrapyd_client.exceptions``.
 - **BREAKING CHANGE:** Move ``HEADERS`` from ``scrapyd_client.utils`` to ``scrapyd_client.lib``.
-- **BREAKING CHANGE:** Move ``scrapyd_client.commands`` into ``scrapyd_client.cli``.
+- **BREAKING CHANGE:** Merge ``scrapyd_client.commands`` and ``scrapyd_client.cli`` into ``scrapyd_client.__main__``.
 - The ``scrapyd-client schedule`` subcommand accepts multiple ``--arg setting=...`` arguments. (@mxdev88)
 - The ``scrapyd_client.lib.schedule`` and ``scrapyd_client.ScrapyClient.schedule`` methods accept ``args`` as a list, instead of as a dict.
 - The ``scrapyd-deploy --debug`` option prints the subprocess' standard output and standard error, instead of writing to ``stdout`` and ``stderr`` files.

@@ -43,7 +43,7 @@ test = [
 
 [project.scripts]
 scrapyd-deploy = "scrapyd_client.deploy:main"
-scrapyd-client = "scrapyd_client.cli:main"
+scrapyd-client = "scrapyd_client.__main__:main"
 
 [tool.setuptools.packages.find]
 exclude = [

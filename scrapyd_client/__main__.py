@@ -178,3 +178,7 @@ def main():
         exit_code = 0
     finally:
         raise SystemExit(exit_code)
+
+
+if __name__ == "__main__":
+    main()
