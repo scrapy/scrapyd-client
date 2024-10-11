@@ -136,7 +136,7 @@ def conf_mixed_targets(project):
     )
 
 
-def assertLines(actual, expected):
+def assert_lines(actual, expected):
     if isinstance(expected, str):
         assert actual.splitlines() == expected.splitlines()
     else:
@@ -153,7 +153,7 @@ def test_not_in_project(args, script_runner):
     ret = script_runner.run(["scrapyd-deploy", *args])
 
     assert ret.stdout == ""
-    assertLines(ret.stderr, "Error: no Scrapy project found in this location")
+    assert_lines(ret.stderr, "Error: no Scrapy project found in this location")
     assert not ret.success
 
 
@@ -162,7 +162,7 @@ def test_too_many_arguments(args, script_runner, project):
     ret = script_runner.run(["scrapyd-deploy", "mytarget", "extra"])
 
     assert ret.stdout == ""
-    assertLines(
+    assert_lines(
         ret.stderr,
         dedent(
             """\
@@ -181,14 +181,14 @@ def test_list_targets_missing_url(script_runner, conf_no_url):
     ret = script_runner.run(["scrapyd-deploy", "mytarget"])
 
     assert ret.stdout == ""
-    assertLines(ret.stderr, [r"Packing version \d+", "Error: Missing url for project"])
+    assert_lines(ret.stderr, [r"Packing version \d+", "Error: Missing url for project"])
     assert not ret.success
 
 
 def test_list_targets_with_default(script_runner, conf_mixed_targets):
     ret = script_runner.run(["scrapyd-deploy", "-l"])
 
-    assertLines(
+    assert_lines(
         ret.stdout,
         dedent(
             """\
@@ -204,7 +204,7 @@ def test_list_targets_with_default(script_runner, conf_mixed_targets):
 def test_list_targets_without_default(script_runner, conf_named_targets):
     ret = script_runner.run(["scrapyd-deploy", "-l"])
 
-    assertLines(
+    assert_lines(
         ret.stdout,
         dedent(
             """\
@@ -221,7 +221,7 @@ def test_unknown_target_implicit(script_runner, project):
     ret = script_runner.run(["scrapyd-deploy"])
 
     assert ret.stdout == ""
-    assertLines(ret.stderr, "Unknown target: default")
+    assert_lines(ret.stderr, "Unknown target: default")
     assert not ret.success
 
 
@@ -229,7 +229,7 @@ def test_unknown_target_explicit(script_runner, project):
     ret = script_runner.run(["scrapyd-deploy", "nonexistent"])
 
     assert ret.stdout == ""
-    assertLines(ret.stderr, "Unknown target: nonexistent")
+    assert_lines(ret.stderr, "Unknown target: nonexistent")
     assert not ret.success
 
 
@@ -239,7 +239,7 @@ def test_empty_section_implicit_target(
     ret = script_runner.run(["scrapyd-deploy"])
 
     assert ret.stdout == ""
-    assertLines(ret.stderr, "Unknown target: default")
+    assert_lines(ret.stderr, "Unknown target: default")
     assert not ret.success
 
 
@@ -249,7 +249,7 @@ def test_empty_section_explicit_target(
     ret = script_runner.run(["scrapyd-deploy", "mytarget"])
 
     assert ret.stdout == ""
-    assertLines(ret.stderr, "Error: Missing project")
+    assert_lines(ret.stderr, "Error: Missing project")
     assert not ret.success
 
 
@@ -257,7 +257,7 @@ def test_deploy_missing_project(script_runner, conf_no_project):
     ret = script_runner.run(["scrapyd-deploy"])
 
     assert ret.stdout == ""
-    assertLines(ret.stderr, "Error: Missing project")
+    assert_lines(ret.stderr, "Error: Missing project")
     assert not ret.success
 
 
@@ -265,7 +265,7 @@ def test_deploy_missing_url(script_runner, conf_no_url):
     ret = script_runner.run(["scrapyd-deploy", "mytarget"])
 
     assert ret.stdout == ""
-    assertLines(ret.stderr, [r"Packing version \d+", "Error: Missing url for project"])
+    assert_lines(ret.stderr, [r"Packing version \d+", "Error: Missing url for project"])
     assert not ret.success
 
 
@@ -273,7 +273,7 @@ def test_build_egg(script_runner, project):
     ret = script_runner.run(["scrapyd-deploy", "--build-egg", "myegg.egg"])
 
     assert ret.stdout == ""
-    assertLines(ret.stderr, "Writing egg to myegg.egg")
+    assert_lines(ret.stderr, "Writing egg to myegg.egg")
     assert ret.success
 
 
@@ -283,7 +283,7 @@ def test_build_egg_inc_dependencies_no_dep(script_runner, project):
     )
 
     assert ret.stdout == ""
-    assertLines(
+    assert_lines(
         ret.stderr,
         dedent(
             """\
@@ -301,7 +301,7 @@ def test_build_egg_inc_dependencies_with_dep(script_runner, project_with_depende
     )
 
     assert ret.stdout == ""
-    assertLines(
+    assert_lines(
         ret.stderr,
         dedent(
             """\
@@ -321,8 +321,8 @@ def test_deploy_success(script_runner, conf_default_target):
 
         ret = script_runner.run(["scrapyd-deploy"])
 
-        assertLines(ret.stdout, '{"status": "ok"}')
-        assertLines(
+        assert_lines(ret.stdout, '{"status": "ok"}')
+        assert_lines(
             ret.stderr,
             [
                 r"Packing version \d+",
@@ -357,8 +357,8 @@ def test_deploy_httperror(content, expected, script_runner, conf_default_target)
 
         ret = script_runner.run(["scrapyd-deploy"])
 
-        assertLines(ret.stdout, f"{expected}")
-        assertLines(
+        assert_lines(ret.stdout, f"{expected}")
+        assert_lines(
             ret.stderr,
             [
                 r"Packing version \d+",
@@ -377,7 +377,7 @@ def test_deploy_urlerror(script_runner, conf_default_target):
         ret = script_runner.run(["scrapyd-deploy"])
 
         assert ret.stdout == ""
-        assertLines(
+        assert_lines(
             ret.stderr,
             [
                 r"Packing version \d+",

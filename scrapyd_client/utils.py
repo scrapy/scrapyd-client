@@ -25,11 +25,11 @@ class EnvInterpolation(BasicInterpolation):
         return os.path.expandvars(value)
 
 
-class ErrorResponse(Exception):
+class ErrorResponse(Exception):  # noqa: N818
     """Raised when Scrapyd reports an error."""
 
 
-class MalformedResponse(Exception):
+class MalformedResponse(Exception):  # noqa: N818
     """Raised when the response can't be decoded."""
 
 
@@ -37,8 +37,8 @@ def _process_response(response):
     """Process the response object into a dictionary."""
     try:
         response = response.json()
-    except JSONDecodeError:
-        raise MalformedResponse(response.text)
+    except JSONDecodeError as e:
+        raise MalformedResponse(response.text) from e
 
     status = response["status"]
     if status == "ok":

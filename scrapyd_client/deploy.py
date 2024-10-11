@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import glob
 import json
 import os
@@ -14,7 +12,6 @@ from urllib.parse import urljoin
 from urllib.request import HTTPRedirectHandler as UrllibHTTPRedirectHandler
 from urllib.request import Request, build_opener, install_opener, urlopen
 
-import setuptools  # noqa: F401 not used in code but needed in runtime, don't remove!
 from scrapy.utils.conf import closest_scrapy_cfg
 from scrapy.utils.project import inside_project
 from urllib3.filepost import encode_multipart_formdata
@@ -106,7 +103,7 @@ def main():
         shutil.copyfile(eggpath, opts.build_egg)
     elif opts.deploy_all_targets:
         version = None
-        for name, target in _get_targets().items():
+        for target in _get_targets().values():
             if version is None:
                 version = _get_version(target, opts)
             _, tmpdir = _build_egg_and_deploy_target(target, version, opts)
@@ -214,7 +211,7 @@ def _get_target(name):
     try:
         return _get_targets()[name]
     except KeyError:
-        raise _fail(f"Unknown target: {name}")
+        raise _fail(f"Unknown target: {name}") from None
 
 
 def _url(target, action):

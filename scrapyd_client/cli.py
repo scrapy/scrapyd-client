@@ -85,7 +85,7 @@ def parse_cli_args(args):
         "processing stdout in scripts.",
     )
 
-    # TODO remove next two lines when 'deploy' is moved to this module
+    # If 'deploy' is moved to this module, these lines can be removed. (b9ba799)
     parsed_args, _ = mainparser.parse_known_args(args)
     if getattr(parsed_args, "action", None) is not commands.deploy:
         parsed_args = mainparser.parse_args(args)
@@ -98,6 +98,7 @@ def parse_cli_args(args):
 
 
 def main():
+    max_response_length = 120
     try:
         args = parse_cli_args(sys.argv[1:])
         args.action(args)
@@ -116,12 +117,12 @@ def main():
         exit_code = 1
     except MalformedResponse as e:
         text = str(e)
-        if len(text) > 120:
+        if len(text) > max_response_length:
             text = f"{text[:50]} [...] {text[-50:]}"
         print("Received a malformed response:")
         print(text)
         exit_code = 1
-    except Exception:
+    except Exception:  # noqa: BLE001
         print(f"Caught unhandled exception, please report at {ISSUE_TRACKER_URL}")
         print_exc()
         exit_code = 3

@@ -6,7 +6,7 @@ from scrapyd_client import lib
 INDENT_PREFIX = "  "
 
 
-def deploy(args):
+def deploy(args):  # noqa: ARG001
     """Deploy a Scrapy project to a Scrapyd instance. For help, invoke scrapyd-deploy."""
     from scrapyd_client import deploy
 
