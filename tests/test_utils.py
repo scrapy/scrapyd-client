@@ -1,9 +1,18 @@
+import netrc
+
 import pytest
 from requests.auth import HTTPBasicAuth
 
 from scrapyd_client.utils import get_auth
 
+try:
+    netrc.netrc()
+    exists = True
+except FileNotFoundError:
+    exists = False
 
+
+@pytest.mark.skipif(exists, reason="a .netrc file exists")
 @pytest.mark.parametrize(
     "url,username,password,expected",
     [
