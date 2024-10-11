@@ -282,7 +282,8 @@ def _build_egg(opts):
     os.chdir(os.path.dirname(closest))
     if not os.path.exists("setup.py"):
         settings = get_config().get("settings", "default")
-        _create_default_setup_py(settings=settings)
+        with open("setup.py", "w") as f:
+            f.write(_SETUP_PY_TEMPLATE % {"settings": settings})
     tmpdir = tempfile.mkdtemp(prefix="scrapydeploy-")
 
     if opts.include_dependencies:
@@ -298,11 +299,6 @@ def _build_egg(opts):
 
     egg = glob.glob(os.path.join(tmpdir, "*.egg"))[0]
     return egg, tmpdir
-
-
-def _create_default_setup_py(**kwargs):
-    with open("setup.py", "w") as f:
-        f.write(_SETUP_PY_TEMPLATE % kwargs)
 
 
 class HTTPRedirectHandler(UrllibHTTPRedirectHandler):
