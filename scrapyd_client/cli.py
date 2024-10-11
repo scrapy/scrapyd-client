@@ -2,7 +2,7 @@ import sys
 from argparse import ArgumentParser
 from traceback import print_exc
 
-from requests.exceptions import ConnectionError
+import requests
 
 from scrapyd_client import commands
 from scrapyd_client.utils import (
@@ -106,7 +106,7 @@ def main():
         exit_code = 0
     except SystemExit as e:
         exit_code = e.code
-    except ConnectionError as e:
+    except requests.ConnectionError as e:
         print(f"Failed to connect to target ({args.target}):")
         print(e)
         exit_code = 1

@@ -1,7 +1,7 @@
+import json
 import netrc
 import os
 from configparser import BasicInterpolation, ConfigParser
-from json.decoder import JSONDecodeError
 from urllib.parse import urlparse
 
 import requests
@@ -33,7 +33,7 @@ def _process_response(response):
     """Process the response object into a dictionary."""
     try:
         response = response.json()
-    except JSONDecodeError as e:
+    except json.decoder.JSONDecodeError as e:
         raise MalformedResponse(response.text) from e
 
     status = response["status"]
