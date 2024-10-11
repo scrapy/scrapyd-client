@@ -284,8 +284,6 @@ def _build_egg(opts):
         settings = get_config().get("settings", "default")
         _create_default_setup_py(settings=settings)
     tmpdir = tempfile.mkdtemp(prefix="scrapydeploy-")
-    out = open(os.path.join(tmpdir, "stdout"), "wb")
-    err = open(os.path.join(tmpdir, "stderr"), "wb")
 
     if opts.include_dependencies:
         _log("Including dependencies from requirements.txt")
@@ -295,10 +293,8 @@ def _build_egg(opts):
     else:
         command = "bdist_egg"
 
-    subprocess.check_call([sys.executable, "setup.py", "clean", "-a", command, "-d", tmpdir], stdout=out, stderr=err)
-
-    out.close()
-    err.close()
+    kwargs = {} if opts.debug else {"stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL}
+    process = subprocess.run([sys.executable, "setup.py", "clean", "-a", command, "-d", tmpdir], check=True, **kwargs)
 
     egg = glob.glob(os.path.join(tmpdir, "*.egg"))[0]
     return egg, tmpdir

@@ -7,6 +7,7 @@ History
 Changed
 ^^^^^^^
 
+- The ``scrapyd-deploy --debug`` option prints the subprocess' standard output and standard error, instead of writing to ``stdout`` and ``stderr`` files.
 - The ``scrapyd_client.lib.schedule`` and ``scrapyd_client.ScrapyClient.schedule`` methods accept ``args`` as a list, instead of as a dict.
 
 Fixed
