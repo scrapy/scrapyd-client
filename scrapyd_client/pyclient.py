@@ -40,9 +40,7 @@ class ScrapydClient:
             password=self.password,
         )
 
-    def schedule(
-        self, project: str, spider: str, args: list[tuple[str, str]] | None = None
-    ) -> str:
+    def schedule(self, project: str, spider: str, args: list[tuple[str, str]] | None = None) -> str:
         if args is None:
             args = []
         return lib.schedule(

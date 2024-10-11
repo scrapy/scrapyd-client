@@ -32,6 +32,4 @@ def test_get_auth(url, username, password, expected):
 def test_get_auth_netrc(mocker):
     n = mocker.patch("scrapyd_client.utils.netrc")  # mock netrc
     n.netrc.return_value.authenticators.return_value = ("user", "", "pass")
-    assert get_auth("http://localhost:6800", None, None) == HTTPBasicAuth(
-        "user", "pass"
-    )
+    assert get_auth("http://localhost:6800", None, None) == HTTPBasicAuth("user", "pass")

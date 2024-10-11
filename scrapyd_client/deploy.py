@@ -37,15 +37,9 @@ def parse_args():
     parser = ArgumentParser(description="Deploy Scrapy project to Scrapyd server")
     parser.add_argument("target", nargs="?", default="default", metavar="TARGET")
     parser.add_argument("-p", "--project", help="the project name in the TARGET")
-    parser.add_argument(
-        "-v", "--version", help="the version to deploy. Defaults to current timestamp"
-    )
-    parser.add_argument(
-        "-l", "--list-targets", action="store_true", help="list available targets"
-    )
-    parser.add_argument(
-        "-a", "--deploy-all-targets", action="store_true", help="deploy all targets"
-    )
+    parser.add_argument("-v", "--version", help="the version to deploy. Defaults to current timestamp")
+    parser.add_argument("-l", "--list-targets", action="store_true", help="list available targets")
+    parser.add_argument("-a", "--deploy-all-targets", action="store_true", help="deploy all targets")
     parser.add_argument(
         "-d",
         "--debug",
@@ -58,12 +52,8 @@ def parse_args():
         metavar="TARGET",
         help="list available projects in the TARGET",
     )
-    parser.add_argument(
-        "--egg", metavar="FILE", help="use the given egg, instead of building it"
-    )
-    parser.add_argument(
-        "--build-egg", metavar="FILE", help="only build the egg, don't deploy it"
-    )
+    parser.add_argument("--egg", metavar="FILE", help="use the given egg, instead of building it")
+    parser.add_argument("--build-egg", metavar="FILE", help="only build the egg, don't deploy it")
     parser.add_argument(
         "--include-dependencies",
         action="store_true",
@@ -253,7 +243,6 @@ def _get_version(target, opts):
     return str(int(time.time()))
 
 
-
 def _add_auth_header(request, target):
     url, username, password = (
         target["url"],
@@ -261,9 +250,7 @@ def _add_auth_header(request, target):
         target.get("password", ""),
     )
     if auth := get_auth(url=url, username=username, password=password):
-        request.add_header(
-            "Authorization", basic_auth_header(auth.username, auth.password)
-        )
+        request.add_header("Authorization", basic_auth_header(auth.username, auth.password))
 
 
 def _build_egg(opts):

@@ -16,9 +16,7 @@ def deploy(args):  # noqa: ARG001
 
 def projects(args):
     """List all projects deployed on a Scrapyd instance."""
-    if _projects := lib.get_projects(
-        args.target, username=args.username, password=args.password
-    ):
+    if _projects := lib.get_projects(args.target, username=args.username, password=args.password):
         print("\n".join(_projects))
 
 
@@ -26,9 +24,7 @@ def schedule(args):
     """Schedule the specified spider(s)."""
     job_args = [(x[0], x[1]) for x in (y.split("=", 1) for y in args.arg)]
 
-    for project in lib.get_projects(
-        args.target, args.project, username=args.username, password=args.password
-    ):
+    for project in lib.get_projects(args.target, args.project, username=args.username, password=args.password):
         _spiders = lib.get_spiders(
             args.target,
             project,
@@ -50,12 +46,8 @@ def schedule(args):
 
 def spiders(args):
     """List all spiders for the given project(s)."""
-    for project in lib.get_projects(
-        args.target, args.project, username=args.username, password=args.password
-    ):
-        project_spiders = lib.get_spiders(
-            args.target, project, username=args.username, password=args.password
-        )
+    for project in lib.get_projects(args.target, args.project, username=args.username, password=args.password):
+        project_spiders = lib.get_spiders(args.target, project, username=args.username, password=args.password)
         if not args.verbose:
             print(f"{project}:")
             if project_spiders:

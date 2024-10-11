@@ -143,9 +143,7 @@ def assert_lines(actual, expected):
         lines = actual.splitlines()
         assert len(lines) == len(expected)
         for i, line in enumerate(lines):
-            assert re.search(
-                f"^{expected[i]}$", line
-            ), f"{line} does not match {expected[i]}"
+            assert re.search(f"^{expected[i]}$", line), f"{line} does not match {expected[i]}"
 
 
 @pytest.mark.parametrize("args", [[], ["-l"], ["-L", "default"]])
@@ -233,9 +231,7 @@ def test_unknown_target_explicit(script_runner, project):
     assert not ret.success
 
 
-def test_empty_section_implicit_target(
-    script_runner, conf_empty_section_implicit_target
-):
+def test_empty_section_implicit_target(script_runner, conf_empty_section_implicit_target):
     ret = script_runner.run(["scrapyd-deploy"])
 
     assert ret.stdout == ""
@@ -243,9 +239,7 @@ def test_empty_section_implicit_target(
     assert not ret.success
 
 
-def test_empty_section_explicit_target(
-    script_runner, conf_empty_section_explicit_target
-):
+def test_empty_section_explicit_target(script_runner, conf_empty_section_explicit_target):
     ret = script_runner.run(["scrapyd-deploy", "mytarget"])
 
     assert ret.stdout == ""
@@ -278,9 +272,7 @@ def test_build_egg(script_runner, project):
 
 
 def test_build_egg_inc_dependencies_no_dep(script_runner, project):
-    ret = script_runner.run(
-        ["scrapyd-deploy", "--include-dependencies", "--build-egg", "myegg-deps.egg"]
-    )
+    ret = script_runner.run(["scrapyd-deploy", "--include-dependencies", "--build-egg", "myegg-deps.egg"])
 
     assert ret.stdout == ""
     assert_lines(
@@ -296,9 +288,7 @@ def test_build_egg_inc_dependencies_no_dep(script_runner, project):
 
 
 def test_build_egg_inc_dependencies_with_dep(script_runner, project_with_dependencies):
-    ret = script_runner.run(
-        ["scrapyd-deploy", "--include-dependencies", "--build-egg", "myegg-deps.egg"]
-    )
+    ret = script_runner.run(["scrapyd-deploy", "--include-dependencies", "--build-egg", "myegg-deps.egg"])
 
     assert ret.stdout == ""
     assert_lines(
