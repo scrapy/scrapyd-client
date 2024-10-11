@@ -50,7 +50,6 @@ Deploying a project
 If you don't have a ``setup.py`` file in the root of your project, one will be created. If you have one, it must set the ``entry_points`` keyword argument in the ``setup()`` function call, for example:
 
    .. code-block:: python
-      :emphasize-lines: 5
 
       setup(
           name         = 'project',
@@ -116,7 +115,6 @@ Include data files
 #. Set the ``package_data`` and ``include_package_data` keyword arguments in the ``setup()`` function call in the ``setup.py`` file. For example:
 
    .. code-block:: python
-      :emphasize-lines: 8-9
 
       from setuptools import setup, find_packages
 
@@ -154,7 +152,6 @@ Troubleshooting
    Solution: See `Local settings`_. Or, exclude the module from the egg. If using scrapyd-client's default ``setup.py`` file, change the ``find_package()`` call:
 
    .. code-block:: python
-      :emphasize-lines: 4
 
       setup(
           name         = 'project',
@@ -166,7 +163,6 @@ Troubleshooting
    to:
 
    .. code-block:: python
-      :emphasize-lines: 4
 
       setup(
           name         = 'project',
