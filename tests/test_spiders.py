@@ -11,7 +11,7 @@ for response in responses:
 def test_spiders(mocker, script_runner):
     mock_response = mocker.Mock()
     mock_response.json.side_effect = responses
-    mock_get = mocker.patch("scrapyd_client.utils.requests.get", autospec=True)
+    mock_get = mocker.patch("scrapyd_client.lib.requests.get", autospec=True)
     mock_get.return_value = mock_response
     result = script_runner.run(["scrapyd-client", "spiders", "-p", "*"])
 
@@ -36,7 +36,7 @@ peng:
 def test_spiders_verbose(mocker, script_runner):
     mock_response = mocker.Mock()
     mock_response.json.side_effect = responses
-    mock_get = mocker.patch("scrapyd_client.utils.requests.get", autospec=True)
+    mock_get = mocker.patch("scrapyd_client.lib.requests.get", autospec=True)
     mock_get.return_value = mock_response
     result = script_runner.run(["scrapyd-client", "spiders", "-v", "-p", "*"])
 

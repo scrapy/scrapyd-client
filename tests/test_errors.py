@@ -6,7 +6,7 @@ import requests
 def test_decode_error(mocker, script_runner):
     mock_response = mocker.Mock()
     mock_response.json.side_effect = json.decoder.JSONDecodeError("", "", 0)
-    mock_get = mocker.patch("scrapyd_client.utils.requests.get", autospec=True)
+    mock_get = mocker.patch("scrapyd_client.lib.requests.get", autospec=True)
     mock_get.return_value = mock_response
     result = script_runner.run(["scrapyd-client", "projects"])
 
@@ -20,7 +20,7 @@ def test_projects(mocker, script_runner):
         "status": "error",
         "message": "Something went wrong.",
     }
-    mock_get = mocker.patch("scrapyd_client.utils.requests.get", autospec=True)
+    mock_get = mocker.patch("scrapyd_client.lib.requests.get", autospec=True)
     mock_get.return_value = mock_response
     result = script_runner.run(["scrapyd-client", "projects"])
 
@@ -29,7 +29,7 @@ def test_projects(mocker, script_runner):
 
 
 def test_connection_error(mocker, script_runner):
-    mock_get = mocker.patch("scrapyd_client.utils.requests.get", autospec=True)
+    mock_get = mocker.patch("scrapyd_client.lib.requests.get", autospec=True)
     mock_get.side_effect = requests.ConnectionError()
     result = script_runner.run(["scrapyd-client", "projects"])
 

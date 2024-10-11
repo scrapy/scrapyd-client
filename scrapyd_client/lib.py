@@ -1,6 +1,13 @@
 import fnmatch
+import json
 
-from scrapyd_client.utils import get_auth, get_request, post_request
+import requests
+
+from scrapyd_client.exceptions import ErrorResponse, MalformedResponse
+from scrapyd_client.utils import get_auth
+
+HEADERS = requests.utils.default_headers().copy()
+HEADERS["User-Agent"] = "Scrapyd-client/2.0.0"
 
 
 def get_projects(url, pattern="*", username=None, password=None):
@@ -18,7 +25,7 @@ def get_projects(url, pattern="*", username=None, password=None):
     :type pattern: str
     :rtype: A list of strings.
     """
-    response = get_request(
+    response = _get_request(
         f"{url}/listprojects.json",
         auth=get_auth(url=url, username=username, password=password),
     )
@@ -42,7 +49,7 @@ def get_spiders(url, project, pattern="*", username=None, password=None):
     :type pattern: str
     :rtype: A list of strings.
     """
-    response = get_request(
+    response = _get_request(
         f"{url}/listspiders.json",
         params={"project": project},
         auth=get_auth(url=url, username=username, password=password),
@@ -64,7 +71,7 @@ def get_jobs(url, project, username=None, password=None):
     :type pattern: str
     :rtype: A list of strings.
     """
-    return get_request(
+    return _get_request(
         f"{url}/listjobs.json",
         params={"project": project},
         auth=get_auth(url=url, username=username, password=password),
@@ -92,9 +99,53 @@ def schedule(url, project, spider, args=None, username=None, password=None):
     """
     if args is None:
         args = []
-    response = post_request(
+    response = _post_request(
         f"{url}/schedule.json",
         data=[*args, ("project", project), ("spider", spider)],
         auth=get_auth(url=url, username=username, password=password),
     )
     return response["jobid"]
+
+
+def _process_response(response):
+    """Process the response object into a dictionary."""
+    try:
+        response = response.json()
+    except json.decoder.JSONDecodeError as e:
+        raise MalformedResponse(response.text) from e
+
+    status = response["status"]
+    if status == "ok":
+        return response
+    if status == "error":
+        raise ErrorResponse(response["message"])
+    raise RuntimeError(f"Unhandled response status: {status}")
+
+
+def _get_request(url, params=None, auth=None):
+    """
+    Dispatches a request with GET method.
+
+    :param url: The URL to request.
+    :type url: str
+    :param params: The GET parameters.
+    :type params: mapping
+    :returns: The processed response.
+    :rtype: mapping
+    """
+    if params is None:
+        params = {}
+    return _process_response(requests.get(url, params=params, headers=HEADERS, auth=auth))
+
+
+def _post_request(url, data, auth=None):
+    """
+    Dispatches a request with POST method.
+
+    :param url: The URL to request.
+    :type url: str
+    :param data: The data to post.
+    :returns: The processed response.
+    :rtype: mapping
+    """
+    return _process_response(requests.post(url, data=data, headers=HEADERS, auth=auth))

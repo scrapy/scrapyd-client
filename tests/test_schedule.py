@@ -13,12 +13,12 @@ def test_schedule(mocker, script_runner):
 
     mock_get_response = mocker.Mock()
     mock_get_response.json.side_effect = get_responses
-    mock_get = mocker.patch("scrapyd_client.utils.requests.get", autospec=True)
+    mock_get = mocker.patch("scrapyd_client.lib.requests.get", autospec=True)
     mock_get.return_value = mock_get_response
 
     mock_post_response = mocker.Mock()
     mock_post_response.json.side_effect = post_responses
-    mock_post = mocker.patch("scrapyd_client.utils.requests.post", autospec=True)
+    mock_post = mocker.patch("scrapyd_client.lib.requests.post", autospec=True)
     mock_post.return_value = mock_post_response
 
     result = script_runner.run(["scrapyd-client", "schedule", "-p", "foo", "bar"])
