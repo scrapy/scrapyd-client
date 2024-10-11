@@ -7,8 +7,9 @@ History
 Added
 ^^^^^
 
-- Add support for Python 3.12.
+- Add ``scrapyd-client targets`` subcommand.
 - ``scrapyd-client`` can be called as ``python -m scrapyd_client``.
+- Add support for Python 3.12.
 
 Changed
 ^^^^^^^
@@ -29,7 +30,8 @@ Fixed
 Removed
 ^^^^^^^
 
-- **BREAKING CHANGE:** Remove the ``scrapyd-deploy --list-projects`` option, in favor of ``scrapyd-client projects``.
+- **BREAKING CHANGE:** Remove the ``scrapyd-deploy --list-targets`` (``-l``) option, in favor of ``scrapyd-client targets``.
+- **BREAKING CHANGE:** Remove the ``scrapyd-deploy --list-projects`` (``-L``) option, in favor of ``scrapyd-client projects``.
 - **BREAKING CHANGE:** Remove the ``get_request`` and ``post_request`` functions from ``scrapyd_client.utils``.
 - **BREAKING CHANGE:** Remove the ``scrapyd_client.lib`` module, in favor of ``scrapyd_client.ScrapydClient``.
 - Remove ``urllib3`` and ``w3lib`` requirements.

@@ -45,3 +45,17 @@ def get_config(use_closest=True):
     cfg = ConfigParser(interpolation=EnvInterpolation())
     cfg.read(conf.get_sources(use_closest))
     return cfg
+
+
+def _get_targets():
+    cfg = get_config()
+    baset = dict(cfg.items("deploy")) if cfg.has_section("deploy") else {}
+    targets = {}
+    if "url" in baset:
+        targets["default"] = baset
+    for section in cfg.sections():
+        if section.startswith("deploy:"):
+            t = baset.copy()
+            t.update(cfg.items(section))
+            targets[section[7:]] = t
+    return targets

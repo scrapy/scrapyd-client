@@ -4,11 +4,12 @@ from textwrap import indent
 from traceback import print_exc
 
 import requests
+from scrapy.utils.project import inside_project
 
 import scrapyd_client.deploy
 from scrapyd_client.exceptions import ErrorResponse, MalformedResponse
 from scrapyd_client.pyclient import ScrapydClient
-from scrapyd_client.utils import DEFAULT_TARGET_URL, get_config
+from scrapyd_client.utils import DEFAULT_TARGET_URL, _get_targets, get_config
 
 ISSUE_TRACKER_URL = "https://github.com/scrapy/scrapyd-client/issues"
 
@@ -21,6 +22,16 @@ def deploy(args):  # noqa: ARG001
     """Deploy a Scrapy project to a Scrapyd instance. For help, invoke scrapyd-deploy."""
     sys.argv.pop(1)
     scrapyd_client.deploy.main()
+
+
+def targets(args):  # noqa: ARG001
+    """List all targets."""
+    if not inside_project():
+        print("Error: no Scrapy project found in this location", file=sys.stderr)
+        sys.exit(1)
+
+    for name, target in _get_targets().items():
+        print("%-20s %s" % (name, target["url"]))
 
 
 def projects(args):
@@ -97,6 +108,9 @@ def parse_cli_args(args):
 
     parser = subparsers.add_parser("deploy", description=deploy.__doc__)
     parser.set_defaults(action=deploy)
+
+    parser = subparsers.add_parser("targets", description=targets.__doc__)
+    parser.set_defaults(action=targets)
 
     parser = subparsers.add_parser("projects", description=projects.__doc__)
     parser.set_defaults(action=projects)

@@ -207,6 +207,13 @@ deploy
 
 This is a wrapper around `scrapyd-deploy`_.
 
+targets
+~~~~~~~
+
+Lists all targets:
+
+   scrapyd-client targets
+
 projects
 ~~~~~~~~
 
@@ -310,14 +317,6 @@ To deploy to one target, run::
 To deploy to all targets, use the ``-a`` option::
 
    scrapyd-deploy -a -p <project>
-
-To list all available targets, use the ``-l`` option::
-
-   scrapyd-deploy -l
-
-To list all available projects on one target, use the ``-L`` option::
-
-   scrapyd-deploy -L example
 
 While your target needs to be defined with its URL in ``scrapy.cfg``,
 you can use `netrc <https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html>`__ for username and password, like so::

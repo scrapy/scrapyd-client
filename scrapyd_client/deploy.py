@@ -14,7 +14,7 @@ from requests.auth import HTTPBasicAuth
 from scrapy.utils.conf import closest_scrapy_cfg
 from scrapy.utils.project import inside_project
 
-from scrapyd_client.utils import get_auth, get_config
+from scrapyd_client.utils import _get_targets, get_auth, get_config
 
 _SETUP_PY_TEMPLATE = """
 # Automatically created by: scrapyd-deploy
@@ -35,7 +35,6 @@ def parse_args():
     parser.add_argument("target", nargs="?", default="default", metavar="TARGET")
     parser.add_argument("-p", "--project", help="the project name in the TARGET")
     parser.add_argument("-v", "--version", help="the version to deploy. Defaults to current timestamp")
-    parser.add_argument("-l", "--list-targets", action="store_true", help="list available targets")
     parser.add_argument("-a", "--deploy-all-targets", action="store_true", help="deploy all targets")
     parser.add_argument(
         "-d",
@@ -59,11 +58,6 @@ def main():
     if not inside_project():
         _log("Error: no Scrapy project found in this location")
         sys.exit(1)
-
-    if opts.list_targets:
-        for name, target in _get_targets().items():
-            print("%-20s %s" % (name, target["url"]))
-        return
 
     tmpdir = None
 
@@ -160,20 +154,6 @@ def _log(message):
 def _fail(message, code=1):
     _log(message)
     sys.exit(code)
-
-
-def _get_targets():
-    cfg = get_config()
-    baset = dict(cfg.items("deploy")) if cfg.has_section("deploy") else {}
-    targets = {}
-    if "url" in baset:
-        targets["default"] = baset
-    for section in cfg.sections():
-        if section.startswith("deploy:"):
-            t = baset.copy()
-            t.update(cfg.items(section))
-            targets[section[7:]] = t
-    return targets
 
 
 def _url(target, action):
