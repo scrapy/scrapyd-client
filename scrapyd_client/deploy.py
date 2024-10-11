@@ -43,12 +43,6 @@ def parse_args():
         action="store_true",
         help="debug mode (do not remove build dir)",
     )
-    parser.add_argument(
-        "-L",
-        "--list-projects",
-        metavar="TARGET",
-        help="list available projects in the TARGET",
-    )
     parser.add_argument("--egg", metavar="FILE", help="use the given egg, instead of building it")
     parser.add_argument("--build-egg", metavar="FILE", help="only build the egg, don't deploy it")
     parser.add_argument(
@@ -69,13 +63,6 @@ def main():
     if opts.list_targets:
         for name, target in _get_targets().items():
             print("%-20s %s" % (name, target["url"]))
-        return
-
-    if opts.list_projects:
-        target = _get_target(opts.list_projects)
-
-        projects = requests.get(_url(target, "listprojects.json"), **_requests_auth(target)).json()["projects"]
-        print(os.linesep.join(projects))
         return
 
     tmpdir = None

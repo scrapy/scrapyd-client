@@ -1,7 +1,7 @@
 History
 -------
 
-1.3.0 (Unreleased)
+2.0.0 (Unreleased)
 ~~~~~~~~~~~~~~~~~~
 
 Added
@@ -25,6 +25,7 @@ Fixed
 Removed
 ^^^^^^^
 
+- **BREAKING CHANGE:** Removed ``scrapyd-deploy --list-projects``, in favor of ``scrapyd-client projects``.
 - Remove ``urllib3`` and ``w3lib`` requirements.
 - Drop support for Python 3.7, 3.8.
 

@@ -146,7 +146,7 @@ def assert_lines(actual, expected):
             assert re.search(f"^{expected[i]}$", line), f"{line} does not match {expected[i]}"
 
 
-@pytest.mark.parametrize("args", [[], ["-l"], ["-L", "default"]])
+@pytest.mark.parametrize("args", [[], ["-l"], ["default"]])
 def test_not_in_project(args, script_runner):
     ret = script_runner.run(["scrapyd-deploy", *args])
 
@@ -155,7 +155,7 @@ def test_not_in_project(args, script_runner):
     assert not ret.success
 
 
-@pytest.mark.parametrize("args", [[], ["-l"], ["-L", "default"]])
+@pytest.mark.parametrize("args", [[], ["-l"], ["default"]])
 def test_too_many_arguments(args, script_runner, project):
     ret = script_runner.run(["scrapyd-deploy", "mytarget", "extra"])
 
@@ -165,8 +165,7 @@ def test_too_many_arguments(args, script_runner, project):
         dedent(
             """\
             usage: scrapyd-deploy [-h] [-p PROJECT] [-v VERSION] [-l] [-a] [-d]
-                                  [-L TARGET] [--egg FILE] [--build-egg FILE]
-                                  [--include-dependencies]
+                                  [--egg FILE] [--build-egg FILE] [--include-dependencies]
                                   [TARGET]
             scrapyd-deploy: error: unrecognized arguments: extra
             """

@@ -9,7 +9,7 @@ from requests.auth import HTTPBasicAuth
 from scrapy.utils import conf
 
 HEADERS = requests.utils.default_headers().copy()
-HEADERS["User-Agent"] = "Scrapyd-client/1.2.3"
+HEADERS["User-Agent"] = "Scrapyd-client/2.0.0"
 DEFAULT_TARGET_URL = "http://localhost:6800"
 
 
