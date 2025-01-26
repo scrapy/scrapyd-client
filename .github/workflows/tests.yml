@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        python-version: [3.9, '3.10', '3.11', '3.12', pypy-3.10]
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13', pypy-3.10]
         # It is difficult to install libxml2 and libxslt development packages on Windows.
         # https://www.lfd.uci.edu/~gohlke/pythonlibs/ distributes a wheel, but the URL changes.
         exclude:
