@@ -72,7 +72,7 @@ def main():
                 version = _get_version(target, opts)
             _, tmpdir = _build_egg_and_deploy_target(target, version, opts)
             _remove_tmpdir(tmpdir, opts)
-    else:  # buld egg and deploy
+    else:  # build egg and deploy
         try:
             target = _get_targets()[opts.target]
         except KeyError:
