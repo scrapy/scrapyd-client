@@ -40,6 +40,13 @@ class ScrapydClient:
         response = self._post("schedule", data=[*args, ("project", project), ("spider", spider)])
         return response["jobid"]
 
+    def status(self, jobid: str, project: str | None = None) -> dict:
+        params = {"job": jobid}
+        if project is not None:
+            params["project"] = project
+
+        return self._get("status", params)
+
     def _get(self, basename: str, params=None):
         if params is None:
             params = {}
