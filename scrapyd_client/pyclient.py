@@ -10,17 +10,15 @@ from scrapyd_client.utils import get_auth
 
 DEFAULT_TARGET_URL = "http://localhost:6800"
 HEADERS = requests.utils.default_headers().copy()
-HEADERS["User-Agent"] = "Scrapyd-client/2.0.1"
+HEADERS["User-Agent"] = "Scrapyd-client/2.0.2"
 
 
 class ScrapydClient:
     """ScrapydClient to interact with a Scrapyd instance."""
 
-    def __init__(
-        self, url: str = DEFAULT_TARGET_URL, username: str | None = None, password: str | None = None
-    ) -> None:
+    def __init__(self, url: str | None = None, username: str | None = None, password: str | None = None) -> None:
         """Initialize ScrapydClient."""
-        self.url = url
+        self.url = DEFAULT_TARGET_URL if url is None else url
         self.auth = get_auth(url=self.url, username=username, password=password)
 
     def projects(self, pattern: str = "*") -> list[str]:

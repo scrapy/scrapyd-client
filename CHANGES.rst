@@ -1,6 +1,14 @@
 History
 -------
 
+2.0.2 (2025-03-08)
+~~~~~~~~~~~~~~~~~~
+
+Fixed
+^^^^^
+
+- ``scrapyd_client.ScrapyClient`` uses the target's URL instead of the target's name when constructing URLs. (Regression in "``scrapyd-client`` raises an error if no Scrapy project is found, like ``scrapyd-deploy``, instead of assuming a target at ``http://localhost:6800``")
+
 2.0.1 (2025-02-12)
 ~~~~~~~~~~~~~~~~~~
 

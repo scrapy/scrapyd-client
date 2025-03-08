@@ -17,7 +17,7 @@ ISSUE_TRACKER_URL = "https://github.com/scrapy/scrapyd-client/issues"
 def _get_client(args):
     target = _get_targets()[args.target]
 
-    return ScrapydClient(args.target, target.get("username"), password=target.get("password", ""))
+    return ScrapydClient(target.get("url"), target.get("username"), password=target.get("password", ""))
 
 
 def deploy(args):  # noqa: ARG001
