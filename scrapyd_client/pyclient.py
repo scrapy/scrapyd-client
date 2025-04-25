@@ -86,7 +86,7 @@ class ScrapydClient:
         if version == "all":
             versions = self.versions(project)
             for version in versions:
-                self.delversion(project, version)
+                self._post("delversion", data={"project": project, "version": version})
             return {"status": "ok", "message": "All versions deleted."}
         if version not in self.versions(project):
             raise ErrorResponse(f"Version {version} not found in project {project}.")
