@@ -43,7 +43,7 @@ def projects(args):
 def schedule(args):
     """Schedule the specified spider(s)."""
     client = _get_client(args)
-    job_args = [(key, value) for job_arg in args.arg for key, value in job_arg.split("=", 1)]
+    job_args = [tuple(job_arg.split("=", 1)) for job_arg in args.arg]
 
     for project in client.projects(args.project):
         for spider in client.spiders(project, args.spider):
