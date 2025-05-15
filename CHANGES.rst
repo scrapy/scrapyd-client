@@ -1,8 +1,17 @@
 History
 -------
 
-Unreleased
-~~~~~~~~~~
+2.0.3 (2025-05-15)
+~~~~~~~~~~~~~~~~~~
+
+Added
+^^^^^
+
+- ``scrapyd_client.ScrapyClient.cancel``
+- ``scrapyd_client.ScrapyClient.daemonstatus``
+- ``scrapyd_client.ScrapyClient.delproject``
+- ``scrapyd_client.ScrapyClient.delversion``
+- ``scrapyd_client.ScrapyClient.versions``
 
 Fixed
 ^^^^^
