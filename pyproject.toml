@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scrapyd-client"
-version = "2.0.2"
+version = "2.0.3"
 authors = [{name = "Scrapy developers", email = "info@scrapy.org"}]
 description = "A client for Scrapyd"
 readme = "README.rst"
