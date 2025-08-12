@@ -117,7 +117,7 @@ def parse_cli_args(args):
         "--verbose",
         action="store_true",
         default=False,
-        help="Prints project's and spider's name in each line, intended for " "processing stdout in scripts.",
+        help="Prints project's and spider's name in each line, intended for processing stdout in scripts.",
     )
 
     # If 'deploy' is moved to this module, these lines can be removed. (b9ba799)
