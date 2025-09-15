@@ -26,10 +26,13 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
+requires-python = ">=3.11"
 dependencies = [
-    "pip",  # uberegg
+    "pip", # uberegg
     "requests",
+    "rich",
     "scrapy>=0.17",
+    "scrapyrt>=0.17.0",
     "setuptools",
     "uberegg>=0.1.1",
 ]
@@ -81,4 +84,9 @@ ignore-variadic-names = true
 "docs/conf.py" = ["D100", "INP001"]
 "tests/*" = [
     "ARG001", "D", "FBT003", "INP001", "PLR2004", "S", "TRY003",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.13.0",
 ]

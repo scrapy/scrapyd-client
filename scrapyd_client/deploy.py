@@ -11,10 +11,14 @@ from urllib.parse import urljoin
 
 import requests
 from requests.auth import HTTPBasicAuth
+from rich.console import Console
 from scrapy.utils.conf import closest_scrapy_cfg
 from scrapy.utils.project import inside_project
 
 from scrapyd_client.utils import _get_targets, get_auth, get_config
+
+console = Console()
+console_err = Console(stderr=True)
 
 _SETUP_PY_TEMPLATE = """
 # Automatically created by: scrapyd-deploy
@@ -56,14 +60,14 @@ def main():
     opts = parse_args()
     exitcode = 0
     if not inside_project():
-        print("Error: no Scrapy project found in this location", file=sys.stderr)
+        console_err.print("[red]Error: no Scrapy project found in this location[/red]")
         sys.exit(1)
 
     tmpdir = None
 
     if opts.build_egg:  # build egg only
         eggpath, tmpdir = _build_egg(opts)
-        print(f"Writing egg to {opts.build_egg}", file=sys.stderr)
+        console_err.print(f"[blue]Writing egg to {opts.build_egg}[/blue]")
         shutil.copyfile(eggpath, opts.build_egg)
     elif opts.deploy_all_targets:
         version = None
@@ -76,7 +80,7 @@ def main():
         try:
             target = _get_targets()[opts.target]
         except KeyError:
-            print(f"Unknown target: {opts.target}", file=sys.stderr)
+            console_err.print(f"[red]Unknown target: {opts.target}[/red]")
             sys.exit(1)
 
         version = _get_version(target, opts)
@@ -89,7 +93,7 @@ def main():
 def _remove_tmpdir(tmpdir, opts):
     if tmpdir:
         if opts.debug:
-            print(f"Output dir not removed: {tmpdir}", file=sys.stderr)
+            console_err.print(f"[yellow]Output dir not removed: {tmpdir}[/yellow]")
         else:
             shutil.rmtree(tmpdir)
 
@@ -100,18 +104,18 @@ def _build_egg_and_deploy_target(target, version, opts):
 
     project = opts.project or target.get("project")
     if not project:
-        print("Error: Missing project", file=sys.stderr)
+        console_err.print("[red]Error: Missing project[/red]")
         sys.exit(1)
 
     if opts.egg:
-        print(f"Using egg: {opts.egg}", file=sys.stderr)
+        console_err.print(f"[blue]Using egg: {opts.egg}[/blue]")
         eggpath = opts.egg
     else:
-        print(f"Packing version {version}", file=sys.stderr)
+        console_err.print(f"[blue]Packing version {version}[/blue]")
         eggpath, tmpdir = _build_egg(opts)
 
     url = _url(target, "addversion.json")
-    print(f'Deploying to project "{project}" in {url}', file=sys.stderr)
+    console_err.print(f'[bold blue]Deploying to project "{project}" in {url}[/bold blue]')
 
     # Upload egg.
     kwargs = {}
@@ -127,23 +131,23 @@ def _build_egg_and_deploy_target(target, version, opts):
                 **kwargs,
             )
         response.raise_for_status()
-        print(f"Server response ({response.status_code}):", file=sys.stderr)
-        print(response.text)
+        console_err.print(f"[green]✓ Server response ({response.status_code}):[/green]")
+        console.print(response.text)
     except requests.HTTPError as e:
-        print(f"Deploy failed ({e.response.status_code}):", file=sys.stderr)
+        console_err.print(f"[red]✗ Deploy failed ({e.response.status_code}):[/red]")
         exitcode = 1
         try:
             data = e.response.json()
         except json.decoder.JSONDecodeError:
-            print(e.response.text)
+            console.print(f"[dim]{e.response.text}[/dim]")
         else:
             if "status" in data and "message" in data:
-                print(f"Status: {data['status']}")
-                print(f"Message:\n{data['message']}")
+                console.print(f"Status: [yellow]{data['status']}[/yellow]")
+                console.print(f"Message:\n[dim]{data['message']}[/dim]")
             else:
-                print(json.dumps(data, indent=3))
+                console.print(json.dumps(data, indent=3))
     except requests.RequestException as e:
-        print(f"Deploy failed: {e}", file=sys.stderr)
+        console_err.print(f"[red]✗ Deploy failed: {e}[/red]")
         exitcode = 1
 
     return exitcode, tmpdir
@@ -152,7 +156,7 @@ def _build_egg_and_deploy_target(target, version, opts):
 def _url(target, action):
     if "url" in target:
         return urljoin(target["url"], action)
-    print("Error: Missing url for project", file=sys.stderr)
+    console_err.print("[red]Error: Missing url for project[/red]")
     sys.exit(1)
 
 
@@ -199,9 +203,9 @@ def _build_egg(opts):
     tmpdir = tempfile.mkdtemp(prefix="scrapydeploy-")
 
     if opts.include_dependencies:
-        print("Including dependencies from requirements.txt", file=sys.stderr)
+        console_err.print("[blue]Including dependencies from requirements.txt[/blue]")
         if not os.path.isfile("requirements.txt"):
-            print("Error: Missing requirements.txt", file=sys.stderr)
+            console_err.print("[red]Error: Missing requirements.txt[/red]")
             sys.exit(1)
         command = "bdist_uberegg"
     else:

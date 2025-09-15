@@ -1,9 +1,10 @@
 import sys
 from argparse import ArgumentParser
-from textwrap import indent
 from traceback import print_exc
 
 import requests
+from rich.console import Console
+from rich.table import Table
 from scrapy.utils.project import inside_project
 
 import scrapyd_client.deploy
@@ -12,6 +13,9 @@ from scrapyd_client.pyclient import ScrapydClient
 from scrapyd_client.utils import _get_targets, get_config
 
 ISSUE_TRACKER_URL = "https://github.com/scrapy/scrapyd-client/issues"
+
+console = Console()
+console_err = Console(stderr=True)
 
 
 def _get_client(args):
@@ -28,8 +32,19 @@ def deploy(args):  # noqa: ARG001
 
 def targets(args):  # noqa: ARG001
     """List all targets."""
-    for name, target in _get_targets().items():
-        print("%-20s %s" % (name, target["url"]))
+    targets_data = _get_targets()
+    if not targets_data:
+        console.print("[yellow]No targets configured[/yellow]")
+        return
+
+    table = Table(title="Scrapyd Targets")
+    table.add_column("Name", style="cyan", no_wrap=True)
+    table.add_column("URL", style="magenta")
+
+    for name, target in targets_data.items():
+        table.add_row(name, target["url"])
+
+    console.print(table)
 
 
 def projects(args):
@@ -37,7 +52,11 @@ def projects(args):
     client = _get_client(args)
 
     if projects := client.projects():
-        print("\n".join(projects))
+        console.print("[bold blue]Projects:[/bold blue]")
+        for project in projects:
+            console.print(f"  • [green]{project}[/green]")
+    else:
+        console.print("[yellow]No projects found[/yellow]")
 
 
 def schedule(args):
@@ -45,10 +64,12 @@ def schedule(args):
     client = _get_client(args)
     job_args = [tuple(job_arg.split("=", 1)) for job_arg in args.arg]
 
+    console.print("[bold blue]Scheduling spiders...[/bold blue]")
+
     for project in client.projects(args.project):
         for spider in client.spiders(project, args.spider):
             job_id = client.schedule(project, spider, job_args)
-            print(f"{project} / {spider} => {job_id}")
+            console.print(f"  [green]✓[/green] {project} / [cyan]{spider}[/cyan] => [yellow]{job_id}[/yellow]")
 
 
 def spiders(args):
@@ -58,13 +79,15 @@ def spiders(args):
     for project in client.projects(args.project):
         spiders = client.spiders(project)
         if not args.verbose:
-            print(f"{project}:")
+            console.print(f"[bold blue]{project}:[/bold blue]")
             if spiders:
-                print(indent("\n".join(spiders), "  "))
+                for spider in spiders:
+                    console.print(f"  • [green]{spider}[/green]")
             else:
-                print("  No spiders.")
+                console.print("  [dim]No spiders.[/dim]")
         elif spiders:
-            print("\n".join(f"{project} {spider}" for spider in spiders))
+            for spider in spiders:
+                console.print(f"{project} {spider}")
 
 
 def parse_cli_args(args):
@@ -134,7 +157,7 @@ def parse_cli_args(args):
 
 def main():
     if not inside_project():
-        print("Error: no Scrapy project found in this location", file=sys.stderr)
+        console_err.print("[red]Error: no Scrapy project found in this location[/red]")
         sys.exit(1)
 
     max_response_length = 120
@@ -142,27 +165,27 @@ def main():
         args = parse_cli_args(sys.argv[1:])
         args.action(args)
     except KeyboardInterrupt:
-        print("Aborted due to keyboard interrupt.")
+        console.print("[yellow]⚠ Aborted due to keyboard interrupt.[/yellow]")
         exit_code = 0
     except SystemExit as e:
         exit_code = e.code
     except requests.ConnectionError as e:
-        print(f"Failed to connect to target ({args.target}):")
-        print(e)
+        console.print(f"[red]✗ Failed to connect to target ({args.target}):[/red]")
+        console.print(f"[dim]{e}[/dim]")
         exit_code = 1
     except ErrorResponse as e:
-        print("Scrapyd responded with an error:")
-        print(e)
+        console.print("[red]✗ Scrapyd responded with an error:[/red]")
+        console.print(f"[dim]{e}[/dim]")
         exit_code = 1
     except MalformedResponse as e:
         text = str(e)
         if len(text) > max_response_length:
             text = f"{text[:50]} [...] {text[-50:]}"
-        print("Received a malformed response:")
-        print(text)
+        console.print("[red]✗ Received a malformed response:[/red]")
+        console.print(f"[dim]{text}[/dim]")
         exit_code = 1
     except Exception:  # noqa: BLE001
-        print(f"Caught unhandled exception, please report at {ISSUE_TRACKER_URL}")
+        console.print(f"[red]✗ Caught unhandled exception, please report at {ISSUE_TRACKER_URL}[/red]")
         print_exc()
         exit_code = 3
     else:
