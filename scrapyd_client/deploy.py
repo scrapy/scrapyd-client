@@ -165,6 +165,14 @@ def _format_response(response):
     """Format server response in a user-friendly way."""
     try:
         data = response.json()
+
+        # Check if output is going to a terminal or being redirected
+        if not console.is_terminal:
+            # Output JSON when redirected (e.g., to file or pipe)
+            print(json.dumps(data))
+            return
+
+        # Rich formatting for terminal output
         if isinstance(data, dict):
             status = data.get("status", "unknown")
             message = data.get("message", "")
@@ -189,8 +197,11 @@ def _format_response(response):
             # Handle non-dict responses
             console.print(json.dumps(data, indent=2))
     except json.JSONDecodeError:
-        # Fallback to raw text if not JSON
-        console.print(f"[dim]{response.text}[/dim]")
+        # Fallback to raw text
+        if not console.is_terminal:
+            print(response.text)
+        else:
+            console.print(f"[dim]{response.text}[/dim]")
 
 
 def _format_success_details(data):
@@ -268,6 +279,18 @@ def _format_connection_error(exception, target):
     error_str = str(exception)
     target_url = target.get("url", "unknown")
 
+    # If output is redirected, output JSON error format
+    if not console_err.is_terminal:
+        error_data = {
+            "status": "error",
+            "error": "connection_failed",
+            "message": error_str,
+            "target_url": target_url
+        }
+        print(json.dumps(error_data), file=sys.stderr)
+        return
+
+    # Rich formatting for terminal output
     # Parse common connection errors
     if "Connection refused" in error_str:
         console_err.print(f"[yellow]Cannot connect to Scrapyd server at[/yellow] [cyan]{target_url}[/cyan]")
