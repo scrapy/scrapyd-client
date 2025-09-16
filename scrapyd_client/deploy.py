@@ -132,7 +132,7 @@ def _build_egg_and_deploy_target(target, version, opts):
             )
         response.raise_for_status()
         console_err.print(f"[green]✓ Server response ({response.status_code}):[/green]")
-        console.print(response.text)
+        _format_response(response)
     except requests.HTTPError as e:
         console_err.print(f"[red]✗ Deploy failed ({e.response.status_code}):[/red]")
         exitcode = 1
@@ -147,7 +147,8 @@ def _build_egg_and_deploy_target(target, version, opts):
             else:
                 console.print(json.dumps(data, indent=3))
     except requests.RequestException as e:
-        console_err.print(f"[red]✗ Deploy failed: {e}[/red]")
+        console_err.print("[red]✗ Deploy failed[/red]")
+        _format_connection_error(e, target)
         exitcode = 1
 
     return exitcode, tmpdir
@@ -158,6 +159,100 @@ def _url(target, action):
         return urljoin(target["url"], action)
     console_err.print("[red]Error: Missing url for project[/red]")
     sys.exit(1)
+
+
+def _format_response(response):
+    """Format server response in a user-friendly way."""
+    try:
+        data = response.json()
+        if isinstance(data, dict):
+            status = data.get("status", "unknown")
+            message = data.get("message", "")
+            node_name = data.get("node_name", "")
+
+            if status == "ok":
+                console.print("[green]✓ Deploy successful[/green]")
+                if node_name:
+                    console.print(f"[dim]Node: {node_name}[/dim]")
+            elif status == "error":
+                console_err.print("[red]✗ Server returned error[/red]")
+                if node_name:
+                    console.print(f"[dim]Node: {node_name}[/dim]")
+                if message:
+                    _format_error_message(message)
+            else:
+                console.print(f"[yellow]Status:[/yellow] {status}")
+                if message:
+                    console.print(f"[dim]Message: {message}[/dim]")
+                if node_name:
+                    console.print(f"[dim]Node: {node_name}[/dim]")
+        else:
+            # Handle non-dict responses
+            console.print(json.dumps(data, indent=2))
+    except json.JSONDecodeError:
+        # Fallback to raw text if not JSON
+        console.print(f"[dim]{response.text}[/dim]")
+
+
+def _format_error_message(message):
+    """Format long error messages in a readable way."""
+    # Check if it's a Python traceback
+    if "Traceback (most recent call last):" in message:
+        lines = message.split('\n')
+
+        # Find the actual error message (usually the last non-empty line)
+        error_line = ""
+        for line in reversed(lines):
+            if line.strip() and not line.startswith('  '):
+                error_line = line.strip()
+                break
+
+        console_err.print(f"[red]Error:[/red] {error_line}")
+
+        # Show a summary of the traceback
+        traceback_lines = [line for line in lines if 'File "' in line and "line " in line]
+        if traceback_lines:
+            console.print("[dim]Traceback (most recent call):[/dim]")
+            for line in traceback_lines[-3:]:  # Show last 3 stack frames
+                console.print(f"[dim]  {line.strip()}[/dim]")
+
+        # Show full traceback in very dim text for debugging
+        console.print("\n[dim]Full error details:[/dim]")
+        for line in lines:
+            if line.strip():
+                console.print(f"[dim]{line}[/dim]")
+    else:
+        # For non-traceback messages, just print them normally
+        console.print(f"[yellow]Message:[/yellow]\n{message}")
+
+
+def _format_connection_error(exception, target):
+    """Format connection errors in a user-friendly way."""
+    error_str = str(exception)
+    target_url = target.get("url", "unknown")
+
+    # Parse common connection errors
+    if "Connection refused" in error_str:
+        console_err.print(f"[yellow]Cannot connect to Scrapyd server at[/yellow] [cyan]{target_url}[/cyan]")
+        console_err.print("[dim]• Make sure the Scrapyd server is running[/dim]")
+        console_err.print("[dim]• Check if the URL and port are correct[/dim]")
+        console_err.print("[dim]• Verify network connectivity[/dim]")
+    elif "Max retries exceeded" in error_str:
+        console_err.print(f"[yellow]Connection timeout to Scrapyd server at[/yellow] [cyan]{target_url}[/cyan]")
+        console_err.print("[dim]• Server may be overloaded or unreachable[/dim]")
+        console_err.print("[dim]• Check network connectivity and server status[/dim]")
+    elif "Name or service not known" in error_str or "nodename nor servname provided" in error_str:
+        console_err.print(f"[yellow]Cannot resolve hostname:[/yellow] [cyan]{target_url}[/cyan]")
+        console_err.print("[dim]• Check if the hostname is correct[/dim]")
+        console_err.print("[dim]• Verify DNS resolution[/dim]")
+    elif "SSL" in error_str or "certificate" in error_str.lower():
+        console_err.print(f"[yellow]SSL/TLS error connecting to[/yellow] [cyan]{target_url}[/cyan]")
+        console_err.print("[dim]• Check SSL certificate validity[/dim]")
+        console_err.print("[dim]• Try using HTTP instead of HTTPS if appropriate[/dim]")
+    else:
+        # Fallback for other connection errors
+        console_err.print(f"[yellow]Network error connecting to[/yellow] [cyan]{target_url}[/cyan]")
+        console_err.print(f"[dim]Error details: {error_str}[/dim]")
 
 
 def _get_version(target, opts):
