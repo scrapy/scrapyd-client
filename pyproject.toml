@@ -7,7 +7,7 @@ name = "scrapyd-client"
 version = "2.0.3"
 authors = [{name = "Scrapy developers", email = "info@scrapy.org"}]
 description = "A client for Scrapyd"
-readme = "README.rst"
+readme = "README.md"
 license = {text = "BSD"}
 urls = {Homepage = "https://github.com/scrapy/scrapyd-client"}
 classifiers = [
