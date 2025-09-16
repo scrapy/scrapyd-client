@@ -172,8 +172,7 @@ def _format_response(response):
 
             if status == "ok":
                 console.print("[green]✓ Deploy successful[/green]")
-                if node_name:
-                    console.print(f"[dim]Node: {node_name}[/dim]")
+                _format_success_details(data)
             elif status == "error":
                 console_err.print("[red]✗ Server returned error[/red]")
                 if node_name:
@@ -192,6 +191,44 @@ def _format_response(response):
     except json.JSONDecodeError:
         # Fallback to raw text if not JSON
         console.print(f"[dim]{response.text}[/dim]")
+
+
+def _format_success_details(data):
+    """Format successful deployment details in a structured way."""
+    # Extract deployment information
+    project = data.get("project", "unknown")
+    version = data.get("version", "unknown")
+    spiders = data.get("spiders", 0)
+    node_name = data.get("node_name", "")
+
+    # Display project information
+    console.print(f"[cyan]Project:[/cyan] [bold]{project}[/bold]")
+    console.print(f"[cyan]Version:[/cyan] {version}")
+
+    # Display spider count with appropriate formatting
+    if isinstance(spiders, int):
+        if spiders == 0:
+            console.print(f"[yellow]Spiders:[/yellow] {spiders} [dim](no spiders detected)[/dim]")
+        elif spiders == 1:
+            console.print(f"[green]Spiders:[/green] {spiders} spider")
+        else:
+            console.print(f"[green]Spiders:[/green] {spiders} spiders")
+    else:
+        # Handle case where spiders might be a list or other type
+        console.print(f"[green]Spiders:[/green] {spiders}")
+
+    # Display node information
+    if node_name:
+        console.print(f"[blue]Node:[/blue] {node_name}")
+
+    # Add a visual separator for any additional info
+    additional_info = {k: v for k, v in data.items()
+                      if k not in ("status", "project", "version", "spiders", "node_name")}
+
+    if additional_info:
+        console.print("[dim]Additional info:[/dim]")
+        for key, value in additional_info.items():
+            console.print(f"[dim]  {key}: {value}[/dim]")
 
 
 def _format_error_message(message):
