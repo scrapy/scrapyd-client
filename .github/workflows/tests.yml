@@ -26,7 +26,8 @@ jobs:
           sudo apt-get install libxml2-dev libxslt-dev
       - run: pip install .[test]
       - run: coverage run --source=scrapyd_client -m pytest
-      - if: matrix.os == 'ubuntu-latest'
-        run: bash <(curl -s https://codecov.io/bash)
+      - uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+        with:
+          fail_ci_if_error: true
       - run: pip install -U check-manifest setuptools
       - run: check-manifest
